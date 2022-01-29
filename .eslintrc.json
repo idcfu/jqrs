@@ -1,0 +1,39 @@
+{
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base"
+  ],
+
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": ["error"],
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      "always",
+      { "exceptAfterSingleLine": true }
+    ],
+
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "semi",
+          "requireLast": true
+        },
+
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
+      }
+    ],
+
+    "func-names": "off",
+    "func-style": ["error", "expression"],
+    "object-curly-newline": "off"
+  },
+
+  "ignorePatterns": "dist",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  }
+}
