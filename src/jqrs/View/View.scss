@@ -1,0 +1,52 @@
+.jqrs {
+  position: relative;
+  height: 10px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  user-select: none;
+}
+
+.jqrs__track {
+  height: 100%;
+  background-color: #aaa;
+}
+
+.jqrs__thumb {
+  position: absolute;
+  top: -8px;
+  width: 10px;
+  height: 26px;
+  background-color: #444;
+}
+
+.jqrs__tip {
+  position: absolute;
+  top: -26px;
+  padding: 2px 8px;
+  color: #fff;
+  background-color: #444;
+}
+
+.jqrs__progress {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: #444;
+}
+
+.jqrs__scale {
+  position: absolute;
+  top: 26px;
+  width: 100%;
+}
+
+.jqrs__tick {
+  position: absolute;
+}
+
+.temporary {
+  top: 300px;
+  left: 700px;
+  width: 400px;
+}
