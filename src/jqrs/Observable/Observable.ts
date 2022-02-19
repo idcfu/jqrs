@@ -1,32 +1,16 @@
-type EventType = 'calculateTicks'
-| 'findClosestTick'
-| 'handleAction'
-| 'handleDocumentMousemove'
-| 'handleProgressClick'
-| 'handleTrackClick'
-| 'setTip';
-
 class Observable {
-  private readonly observers: Record<EventType, Function[]> = {
-    calculateTicks: [],
-    findClosestTick: [],
-    handleAction: [],
-    handleDocumentMousemove: [],
-    handleProgressClick: [],
-    handleTrackClick: [],
-    setTip: [],
-  };
+  private observers: Function[] = [];
 
-  public attach(eventType: EventType, observer: Function): void {
-    this.observers[eventType].push(observer);
+  public attach(observer: Function): void {
+    this.observers.push(observer);
   }
 
-  public detach(eventType: EventType, observerToDetach: Function): void {
-    this.observers[eventType].filter((observer) => observer !== observerToDetach);
+  public detach(observer: Function): void {
+    this.observers.filter((currentObserver) => currentObserver !== observer);
   }
 
-  public notify(eventType: EventType, data: unknown): void {
-    this.observers[eventType].forEach((observer) => observer(data));
+  public notify(): void {
+    this.observers.forEach((observer) => observer());
   }
 }
 

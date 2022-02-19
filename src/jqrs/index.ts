@@ -1,25 +1,22 @@
-import Model from './Model/Model';
-import Observable from './Observable/Observable';
+import ModelFactory from './Model/ModelFactory';
 import Presenter from './Presenter/Presenter';
 import ViewFactory from './View/ViewFactory';
 import IOptions from './types/IOptions';
+import IUpdate from './types/IUpdate';
 
 declare global {
   interface JQuery {
-    jqrs(options: IOptions): void;
+    jqrs(options: IOptions, update?: IUpdate): Presenter;
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-shadow
 (function $($): void {
-  // eslint-disable-next-line no-param-reassign
-  $.fn.jqrs = function jqrs(options: IOptions = {}): void {
-    for (let index = 0; index < this.length; index += 1) {
-      const model = new Model(new Observable(), options);
-      const view = ViewFactory.initialize(this[index]);
+  const { fn } = $;
+  fn.jqrs = function jqrs(options: IOptions, update?: IUpdate): Presenter {
+    const model = ModelFactory.initialize(options);
+    const view = ViewFactory.initialize(this[0]);
 
-      // eslint-disable-next-line no-new
-      new Presenter(model, view);
-    }
+    return new Presenter(model, view, update);
   };
 }(jQuery));

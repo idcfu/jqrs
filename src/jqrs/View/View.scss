@@ -2,7 +2,9 @@
   position: relative;
   height: 10px;
   font-size: 14px;
+  line-height: 1.5;
   font-family: Arial, sans-serif;
+  color: #444;
   cursor: pointer;
   user-select: none;
 }
@@ -23,7 +25,7 @@
 .jqrs__tip {
   position: absolute;
   top: -26px;
-  padding: 2px 8px;
+  padding: 0 8px;
   color: #fff;
   background-color: #444;
 }
@@ -43,10 +45,4 @@
 
 .jqrs__tick {
   position: absolute;
-}
-
-.temporary {
-  top: 300px;
-  left: 700px;
-  width: 400px;
 }

@@ -1,6 +1,6 @@
 interface ITick {
-  readonly position: number;
-  readonly value: number;
+  position: number;
+  value: number;
 }
 
 export default ITick;

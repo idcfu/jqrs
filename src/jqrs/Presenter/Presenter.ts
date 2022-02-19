@@ -1,46 +1,63 @@
-import Model from '../Model/Model';
+import { IModel } from '../Model/types';
 import View from '../View/View';
-import ITick from '../types/ITick';
+import IUpdate from '../types/IUpdate';
 
 class Presenter {
-  private readonly model;
-  private readonly view;
+  private static update: IUpdate | undefined;
+  private model;
+  private view;
 
-  public constructor(model: Model, view: View) {
+  public constructor(model: IModel, view: View, update?: IUpdate) {
+    Presenter.update = update;
     this.model = model;
     this.view = view;
 
-    this.attachAll();
-
-    this.model.calculateTicks();
-    this.model.setTip();
-    this.model.findClosestTick();
+    this.initialize();
   }
 
-  private attachAll(): void {
-    const { observable: observableModel } = this.model;
-    const { observable: observableView } = this.view;
-
-    observableModel.attach('calculateTicks', this.renderScale.bind(this));
-    observableModel.attach('setTip', this.toggleTip.bind(this));
-    observableModel.attach('findClosestTick', this.setPosition.bind(this));
-    observableView.attach('handleAction', this.findClosestTick.bind(this));
+  public setMin(min: number): void {
+    this.model.setMin(min);
   }
 
-  private renderScale(ticks: ITick[]): void {
-    this.view.renderScale(ticks);
+  public setMax(max: number): void {
+    this.model.setMax(max);
   }
 
-  private toggleTip(hasTip: boolean): void {
-    this.view.toggleTip(hasTip);
+  public setStep(step: number): void {
+    this.model.setStep(step);
   }
 
-  private setPosition(tick: ITick): void {
-    this.view.setPosition(tick);
+  public setFrom(from: number): void {
+    this.model.setFrom(from, 'value');
   }
 
-  private findClosestTick(position: number): void {
-    this.model.findClosestTick(position);
+  public setTo(to: number): void {
+    this.model.setTo(to, 'value');
+  }
+
+  public setIsDouble(isDouble: boolean): void {
+    this.model.setIsDouble(isDouble);
+  }
+
+  public setHasTip(hasTip: boolean): void {
+    this.model.setHasTip(hasTip);
+  }
+
+  public setHasScale(hasScale: boolean): void {
+    this.model.setHasScale(hasScale);
+  }
+
+  public setIsVertical(isVertical: boolean): void {
+    this.model.setIsVertical(isVertical);
+  }
+
+  private initialize(): void {
+    this.model.update.attach(this.update.bind(this));
+    this.model.initialize();
+  }
+
+  private update(): void {
+    if (Presenter.update) Presenter.update(this.model.options);
   }
 }
 

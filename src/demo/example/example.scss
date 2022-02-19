@@ -1,0 +1,49 @@
+.example {
+  max-width: 600px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.example__jqrs {
+  max-width: 400px;
+  margin: 0 auto 70px;
+}
+
+.example__options-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 35px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.example__option-name {
+  cursor: pointer;
+}
+
+.example__option-value_type_min,
+.example__option-value_type_max,
+.example__option-value_type_step,
+.example__option-value_type_from,
+.example__option-value_type_to {
+  width: 70px;
+  margin-left: 4px;
+  padding: 2px 2px 2px 4px;
+  font-size: 1.4rem;
+  line-height: inherit;
+  color: inherit;
+  border: 2px solid #aaa;
+
+  &:focus-visible {
+    outline-color: #444;
+  }
+}
+
+.example__option-value_type_double,
+.example__option-value_type_tip,
+.example__option-value_type_scale,
+.example__option-value_type_vertical {
+  cursor: inherit;
+}
