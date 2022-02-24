@@ -94,8 +94,15 @@ class Example {
       case elements.scale:
         plugin.setHasScale(target.checked);
         break;
-      case elements.vertical:
+      case elements.vertical: {
+        const exampleJqrs: HTMLElement | null = elements.example.querySelector('.js-example__jqrs');
+        if (!exampleJqrs) throw new Error("'exampleJqrs' is 'null'");
+
+        if (target.checked) exampleJqrs.classList.add('example__jqrs_vertical');
+        else exampleJqrs.classList.remove('example__jqrs_vertical');
+
         plugin.setIsVertical(target.checked);
+      }
         break;
       default:
     }

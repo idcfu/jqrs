@@ -8,14 +8,28 @@ import Track from './Track/Track';
 
 class ViewFactory {
   public static initialize(element: HTMLElement): View {
-    const observable = new Observable();
-    const track = new Track(observable, element);
-    const thumb = new Thumb(observable, element);
-    const tip = new Tip(thumb.element);
-    const progress = new Progress(observable, element);
-    const scale = new Scale(observable, element);
+    const track = new Track(new Observable(), element);
+    const fromThumb = new Thumb(new Observable(), element);
+    const toThumb = new Thumb(new Observable(), element);
+    const fromTip = new Tip(fromThumb.element);
+    const toTip = new Tip(toThumb.element);
+    const progress = new Progress(new Observable(), element);
+    const scale = new Scale(new Observable(), element);
 
-    return new View(observable, element, track, thumb, tip, progress, scale);
+    return new View(
+      new Observable(),
+      new Observable(),
+      new Observable(),
+      new Observable(),
+      element,
+      track,
+      fromThumb,
+      toThumb,
+      fromTip,
+      toTip,
+      progress,
+      scale,
+    );
   }
 }
 

@@ -1,35 +1,48 @@
 import Observable from '../Observable/Observable';
+import IActiveTick from '../types/IActiveTick';
+import IActiveTicks from '../types/IActiveTicks';
 import IOptions from '../types/IOptions';
 import ITick from '../types/ITick';
-import { IActiveTick, IActiveTicks, IModel } from './types';
+import IModel from './IModel';
 
 class Model implements IModel {
-  public update;
+  public optionsUpdate;
+  public scaleUpdate;
+  public activeTicksUpdate;
   public options;
   public scale;
   public activeTicks;
 
-  public constructor(update: Observable, options: IOptions) {
-    this.update = update;
+  public constructor(
+    optionsUpdate: Observable,
+    scaleUpdate: Observable,
+    activeTicksUpdate: Observable,
+    options: IOptions,
+  ) {
+    this.optionsUpdate = optionsUpdate;
+    this.scaleUpdate = scaleUpdate;
+    this.activeTicksUpdate = activeTicksUpdate;
     this.options = Model.createOptions(options);
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
   }
 
   public initialize(): void {
-    this.update.notify();
+    this.optionsUpdate.notify();
+    this.scaleUpdate.notify();
+    this.activeTicksUpdate.notify();
   }
 
   public setMin(min: number): void {
-    const { options } = this;
+    const { optionsUpdate, scaleUpdate, activeTicksUpdate, options } = this;
     const { max, step } = options;
 
     const newMin = Model.validateNumber(min, 'min');
-    const range = Model.roundToDecimal(max - newMin);
+    const range = Model.roundValue(max - newMin);
 
     if (newMin >= max) {
       options.step = 0.1;
-      options.min = Model.roundToDecimal(max - options.step);
+      options.min = Model.roundValue(max - options.step);
     } else if (step > range) {
       options.step = range;
       options.min = newMin;
@@ -40,19 +53,21 @@ class Model implements IModel {
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
 
-    this.update.notify();
+    optionsUpdate.notify();
+    scaleUpdate.notify();
+    activeTicksUpdate.notify();
   }
 
   public setMax(max: number): void {
-    const { options } = this;
+    const { optionsUpdate, scaleUpdate, activeTicksUpdate, options } = this;
     const { min, step } = options;
 
     const newMax = Model.validateNumber(max, 'max');
-    const range = Model.roundToDecimal(newMax - min);
+    const range = Model.roundValue(newMax - min);
 
     if (newMax <= min) {
       options.step = 0.1;
-      options.max = Model.roundToDecimal(min + options.step);
+      options.max = Model.roundValue(min + options.step);
     } else if (step > range) {
       options.step = range;
       options.max = newMax;
@@ -63,76 +78,132 @@ class Model implements IModel {
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
 
-    this.update.notify();
+    optionsUpdate.notify();
+    scaleUpdate.notify();
+    activeTicksUpdate.notify();
   }
 
   public setStep(step: number): void {
-    const { options } = this;
+    const { optionsUpdate, scaleUpdate, activeTicksUpdate, options } = this;
     const { min, max } = options;
 
     const newStep = Model.validateNumber(step, 'step');
+    const range = Model.roundValue(max - min);
 
     if (newStep <= 0) options.step = 0.1;
-    else if (newStep > max - min) options.step = Model.roundToDecimal(max - min);
+    else if (newStep > range) options.step = range;
     else options.step = newStep;
 
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
 
-    this.update.notify();
+    optionsUpdate.notify();
+    scaleUpdate.notify();
+    activeTicksUpdate.notify();
   }
 
   public setFrom(from: number, type: keyof ITick): void {
-    const { activeTicks } = this;
+    const { optionsUpdate, activeTicksUpdate, options, activeTicks } = this;
+    const { toTick } = activeTicks;
 
     const newFrom = Model.validateNumber(from, 'from');
-    const highestIndex = activeTicks.toTick.index - 1;
 
-    activeTicks.fromTick = this.createActiveTick(newFrom, 0, highestIndex, type);
-    this.options.from = activeTicks.fromTick.tick.value;
+    activeTicks.fromTick = this.createActiveTick(newFrom, 0, toTick.index - 1, type);
+    options.from = activeTicks.fromTick.tick.value;
 
-    this.update.notify();
+    optionsUpdate.notify();
+    activeTicksUpdate.notify();
   }
 
   public setTo(to: number, type: keyof ITick): void {
-    const { activeTicks } = this;
+    const { optionsUpdate, activeTicksUpdate, options, scale, activeTicks } = this;
+    const { fromTick } = activeTicks;
 
     const newTo = Model.validateNumber(to, 'to');
-    const lowestIndex = activeTicks.fromTick.index + 1;
-    const highestIndex = this.scale.length - 1;
 
-    activeTicks.toTick = this.createActiveTick(newTo, lowestIndex, highestIndex, type);
-    this.options.to = activeTicks.toTick.tick.value;
+    activeTicks.toTick = this.createActiveTick(newTo, fromTick.index + 1, scale.length - 1, type);
+    options.to = activeTicks.toTick.tick.value;
 
-    this.update.notify();
+    optionsUpdate.notify();
+    activeTicksUpdate.notify();
   }
 
   public setIsDouble(isDouble: boolean): void {
     Model.validateBoolean(isDouble, 'isDouble');
     this.options.isDouble = isDouble;
 
-    this.update.notify();
+    this.optionsUpdate.notify();
   }
 
   public setHasTip(hasTip: boolean): void {
     Model.validateBoolean(hasTip, 'hasTip');
     this.options.hasTip = hasTip;
 
-    this.update.notify();
+    this.optionsUpdate.notify();
   }
 
   public setHasScale(hasScale: boolean): void {
     Model.validateBoolean(hasScale, 'hasScale');
     this.options.hasScale = hasScale;
 
-    this.update.notify();
+    this.optionsUpdate.notify();
+    this.scaleUpdate.notify();
   }
 
   public setIsVertical(isVertical: boolean): void {
     Model.validateBoolean(isVertical, 'isVertical');
     this.options.isVertical = isVertical;
 
-    this.update.notify();
+    this.optionsUpdate.notify();
+    this.scaleUpdate.notify();
+    this.activeTicksUpdate.notify();
+  }
+
+  public setActiveTick(position: number): void {
+    const { optionsUpdate, activeTicksUpdate, options, scale, activeTicks } = this;
+    const { fromTick, toTick } = activeTicks;
+
+    const closest = this.findClosestTick(position, 'position');
+    const tick = this.createActiveTickHelper(scale.indexOf(closest));
+
+    const differenceWithFrom = Math.abs(position - fromTick.tick.position);
+    const differenceWithTo = Math.abs(position - toTick.tick.position);
+
+    const closestToTick = differenceWithFrom < differenceWithTo ? 'from' : 'to';
+
+    activeTicks[`${closestToTick}Tick`] = tick;
+    options[closestToTick] = tick.tick.value;
+
+    optionsUpdate.notify();
+    activeTicksUpdate.notify();
+  }
+
+  public setActiveTickFromExactPosition(position: number): void {
+    const { optionsUpdate, activeTicksUpdate, options, scale, activeTicks } = this;
+    const { fromTick, toTick } = activeTicks;
+
+    const tickIndex = scale.findIndex(({ position: currentPosition }) => (
+      currentPosition === position
+    ));
+
+    const tick = this.createActiveTickHelper(tickIndex);
+    const isExactBetween = tickIndex - 1 === fromTick.index && tickIndex + 1 === toTick.index;
+
+    if (isExactBetween) {
+      activeTicks.toTick = tick;
+      options.to = tick.tick.value;
+    } else {
+      const differenceWithFrom = Math.abs(tickIndex - fromTick.index);
+      const differenceWithTo = Math.abs(tickIndex - toTick.index);
+
+      const closestToTick = differenceWithFrom < differenceWithTo ? 'from' : 'to';
+
+      activeTicks[`${closestToTick}Tick`] = tick;
+      options[closestToTick] = tick.tick.value;
+    }
+
+    optionsUpdate.notify();
+    activeTicksUpdate.notify();
   }
 
   private static createOptions(options: IOptions): Required<IOptions> {
@@ -172,16 +243,16 @@ class Model implements IModel {
 
     if (min >= max) {
       step = 0.1;
-      min = Model.roundToDecimal(max - step);
+      min = Model.roundValue(max - step);
     }
 
-    const range = Model.roundToDecimal(max - min);
+    const range = Model.roundValue(max - min);
     if (step > range) step = range;
 
     if (from <= min) from = min;
-    else if (from >= to) from = Model.roundToDecimal(to - step);
+    else if (from >= to) from = Model.roundValue(to - step);
 
-    if (to <= from) to = Model.roundToDecimal(from + step);
+    if (to <= from) to = Model.roundValue(from + step);
     else if (to >= max) to = max;
 
     return { min, max, step, from, to, isDouble, hasTip, hasScale, isVertical };
@@ -194,21 +265,32 @@ class Model implements IModel {
   private static validateNumber(value: number, type: 'min' | 'max' | 'step' | 'from' | 'to'): number {
     if (typeof value !== 'number') throw new Error(`Must be: 'typeof ${type} === number'`);
 
-    return this.roundToDecimal(value);
+    return this.roundValue(value);
   }
 
-  private static roundToDecimal(value: number): number {
+  private static roundValue(value: number): number {
     if (value === 0) return 0;
-    return Math.abs(value) < 0.1 ? 0.1 : Math.round(value * 10) / 10;
+    return Math.abs(value) < 0.0001 ? 0.0001 : Math.round(value * 10000) / 10000;
+  }
+
+  private static roundPosition(value: number): number {
+    return Math.round(value * 10000) / 10000;
   }
 
   private createScale(): ITick[] {
-    const { min, max, step } = this.options;
+    const { options } = this;
+    const { min, max } = options;
+    let { step } = options;
 
-    let intervals = Model.roundToDecimal(max - min) / step;
-    if (intervals > 100) intervals = 100;
+    let intervals = Model.roundValue(max - min) / step;
 
-    const intervalPercentage = Model.roundToDecimal(100 / intervals);
+    if (intervals > 1000) {
+      intervals = 1000;
+      step = Model.roundValue((max - min) / 1000);
+      options.step = step;
+    }
+
+    const intervalPercentage = Model.roundPosition(100 / intervals);
 
     const scale: ITick[] = [];
     let position = 0;
@@ -216,8 +298,8 @@ class Model implements IModel {
 
     for (let index = 0; index < intervals; index += 1) {
       scale.push({ position, value });
-      position = Model.roundToDecimal(position + intervalPercentage);
-      value = Model.roundToDecimal(value + step);
+      position = Model.roundPosition(position + intervalPercentage);
+      value = Model.roundValue(value + step);
     }
 
     scale.push({ position: 100, value: max });
@@ -286,12 +368,12 @@ class Model implements IModel {
     }
 
     const firstTick = scale[last];
-    const differenceWithFirstTick = Math.abs(value - firstTick[type]);
+    const differenceWithFirst = Math.abs(value - firstTick[type]);
 
     const lastTick = scale[first];
-    const differenceWithLastTick = Math.abs(value - lastTick[type]);
+    const differenceWithLast = Math.abs(value - lastTick[type]);
 
-    const closest = differenceWithFirstTick < differenceWithLastTick ? firstTick : lastTick;
+    const closest = differenceWithFirst < differenceWithLast ? firstTick : lastTick;
 
     return closest;
   }

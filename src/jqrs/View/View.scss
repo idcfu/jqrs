@@ -1,5 +1,6 @@
 .jqrs {
   position: relative;
+  width: 100px;
   height: 10px;
   font-size: 14px;
   line-height: 1.5;
@@ -7,6 +8,43 @@
   color: #444;
   cursor: pointer;
   user-select: none;
+
+  &_vertical {
+    width: 10px;
+    height: 100%;
+
+    .jqrs__thumb {
+      top: auto;
+      left: -8px;
+      width: 26px;
+      height: 10px;
+      transform: translate(0, 5px);
+    }
+
+    .jqrs__tip {
+      top: 5px;
+      right: -6px;
+      left: auto;
+      transform: translate(100%, -50%);
+    }
+
+    .jqrs__progress {
+      top: auto;
+      left: 0;
+      width: 100%;
+      height: auto;
+    }
+
+    .jqrs__scale {
+      left: -20px;
+      width: auto;
+      height: 100%;
+    }
+
+    .jqrs__tick {
+      transform: translate(-100%, -50%);
+    }
+  }
 }
 
 .jqrs__track {
@@ -20,14 +58,17 @@
   width: 10px;
   height: 26px;
   background-color: #444;
+  transform: translateX(-5px);
 }
 
 .jqrs__tip {
   position: absolute;
   top: -26px;
+  left: 5px;
   padding: 0 8px;
   color: #fff;
   background-color: #444;
+  transform: translateX(-50%);
 }
 
 .jqrs__progress {
@@ -45,4 +86,5 @@
 
 .jqrs__tick {
   position: absolute;
+  transform: translateX(-50%);
 }

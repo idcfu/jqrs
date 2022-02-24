@@ -1,28 +1,52 @@
 import Observable from '../../Observable/Observable';
 
 class Thumb {
-  public readonly observable;
-  public readonly element = document.createElement('div');
+  public move;
+  public element = document.createElement('div');
 
-  private readonly root;
+  private root;
+  private rootDOMRect;
+  private isVertical = false;
 
-  public constructor(observable: Observable, root: HTMLElement) {
-    this.observable = observable;
+  public constructor(move: Observable, root: HTMLElement) {
+    this.move = move;
     this.root = root;
-    this.element.className = 'jqrs__thumb';
-    this.addEventListener();
+    this.rootDOMRect = root.getBoundingClientRect();
+
+    this.initialize();
   }
 
   public render(): void {
-    this.root.appendChild(this.element);
+    this.root.append(this.element);
+  }
+
+  public remove(): void {
+    this.element.remove();
+  }
+
+  public setRootDOMRect(rootDOMRect: DOMRect): void {
+    this.rootDOMRect = rootDOMRect;
+  }
+
+  public setIsVertical(isVertical: boolean): void {
+    this.isVertical = isVertical;
   }
 
   public setPosition(position: number): void {
-    this.element.style.left = `${position}%`;
+    if (this.isVertical) {
+      this.element.style.left = '';
+      this.element.style.bottom = `${position}%`;
+    } else {
+      this.element.style.bottom = '';
+      this.element.style.left = `${position}%`;
+    }
   }
 
-  private addEventListener(): void {
-    this.element.addEventListener('mousedown', this.handleThumbMousedown);
+  private initialize(): void {
+    const { element } = this;
+
+    element.classList.add('jqrs__thumb');
+    element.addEventListener('mousedown', this.handleThumbMousedown);
   }
 
   private handleThumbMousedown = (): void => {
@@ -30,15 +54,21 @@ class Thumb {
     document.addEventListener('mouseup', this.handleDocumentMouseup.bind(this), { once: true });
   };
 
-  private handleDocumentMousemove = ({ clientX }: MouseEvent): void => {
-    const { right, left, width } = this.root.getBoundingClientRect();
+  private handleDocumentMousemove = ({ clientX, clientY }: MouseEvent): void => {
+    const { move, rootDOMRect, isVertical } = this;
+    const { top, left, width, height } = rootDOMRect;
 
-    if (clientX < left || clientX > right) return;
+    let positionPercentage;
 
-    const position = clientX - left;
-    const positionPercentage = 100 / (width / position);
+    if (isVertical) {
+      const position = clientY - top;
+      positionPercentage = 100 - (100 / (height / position));
+    } else {
+      const position = clientX - left;
+      positionPercentage = 100 / (width / position);
+    }
 
-    this.observable.notify('handleDocumentMousemove', positionPercentage);
+    move.notify(positionPercentage);
   };
 
   private handleDocumentMouseup(): void {

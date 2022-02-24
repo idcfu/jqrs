@@ -7,6 +7,12 @@
 .example__jqrs {
   max-width: 400px;
   margin: 0 auto 70px;
+
+  &_vertical {
+    display: flex;
+    justify-content: center;
+    height: 400px;
+  }
 }
 
 .example__options-row {

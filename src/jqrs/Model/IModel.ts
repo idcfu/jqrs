@@ -1,23 +1,18 @@
 import Observable from '../Observable/Observable';
+import IActiveTicks from '../types/IActiveTicks';
 import IOptions from '../types/IOptions';
 import ITick from '../types/ITick';
 
-interface IActiveTick {
-  tick: ITick;
-  index: number;
-}
-
-interface IActiveTicks {
-  fromTick: IActiveTick;
-  toTick: IActiveTick;
-}
-
 interface IModel {
-  update: Observable;
+  optionsUpdate: Observable;
+  scaleUpdate: Observable;
+  activeTicksUpdate: Observable;
   options: Required<IOptions>;
   scale: ITick[];
   activeTicks: IActiveTicks;
   initialize(): void;
+  setActiveTick(position: number): void;
+  setActiveTickFromExactPosition(position: number): void;
   setMin(min: number): void;
   setMax(max: number): void;
   setStep(step: number): void;
@@ -29,4 +24,4 @@ interface IModel {
   setIsVertical(isVertical: boolean): void;
 }
 
-export { IActiveTick, IActiveTicks, IModel };
+export default IModel;

@@ -1,22 +1,27 @@
 class Tip {
-  private readonly root;
-  private readonly element = document.createElement('div');
+  private root;
+  private element = document.createElement('div');
 
   public constructor(root: HTMLElement) {
     this.root = root;
-    this.element.className = 'jqrs__tip';
+
+    this.initialize();
   }
 
   public render(): void {
-    this.root.appendChild(this.element);
+    this.root.append(this.element);
+  }
+
+  public remove(): void {
+    this.element.remove();
   }
 
   public setValue(value: number): void {
     this.element.innerText = String(value);
   }
 
-  public remove(): void {
-    this.element.remove();
+  private initialize(): void {
+    this.element.classList.add('jqrs__tip');
   }
 }
 

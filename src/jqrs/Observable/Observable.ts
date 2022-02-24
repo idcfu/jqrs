@@ -9,8 +9,8 @@ class Observable {
     this.observers.filter((currentObserver) => currentObserver !== observer);
   }
 
-  public notify(): void {
-    this.observers.forEach((observer) => observer());
+  public notify(data?: number): void {
+    this.observers.forEach((observer) => observer(data));
   }
 }
 

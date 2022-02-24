@@ -1,4 +1,4 @@
-import { IModel } from '../Model/types';
+import IModel from '../Model/IModel';
 import View from '../View/View';
 import IUpdate from '../types/IUpdate';
 
@@ -52,12 +52,64 @@ class Presenter {
   }
 
   private initialize(): void {
-    this.model.update.attach(this.update.bind(this));
+    this.setObservers();
     this.model.initialize();
   }
 
-  private update(): void {
-    if (Presenter.update) Presenter.update(this.model.options);
+  private setObservers(): void {
+    const { model, view } = this;
+
+    model.optionsUpdate.attach(this.updateOptions.bind(this));
+    model.scaleUpdate.attach(this.updateScale.bind(this));
+    model.activeTicksUpdate.attach(this.updateThumbs.bind(this));
+    view.trackClick.attach(this.setActiveTick.bind(this));
+    view.fromThumbMove.attach(this.setFromFromPosition.bind(this));
+    view.toThumbMove.attach(this.setToFromPosition.bind(this));
+    view.scaleClick.attach(this.setActiveTickFromExactPosition.bind(this));
+  }
+
+  private updateOptions(): void {
+    const { model, view } = this;
+    const { options } = model;
+    const { isDouble, hasTip, isVertical } = options;
+
+    if (Presenter.update) Presenter.update(options);
+    view.updateOptions({ isDouble, hasTip, isVertical });
+  }
+
+  private updateScale(): void {
+    const { model, view } = this;
+    const {
+      options: {
+        hasScale,
+      },
+      scale,
+    } = model;
+
+    view.updateScale(hasScale, scale);
+  }
+
+  private updateThumbs(): void {
+    const { model, view } = this;
+    const { fromTick, toTick } = model.activeTicks;
+
+    view.updateThumbs(fromTick.tick, toTick.tick);
+  }
+
+  private setActiveTick(position: number): void {
+    this.model.setActiveTick(position);
+  }
+
+  private setFromFromPosition(position: number): void {
+    this.model.setFrom(position, 'position');
+  }
+
+  private setToFromPosition(position: number): void {
+    this.model.setTo(position, 'position');
+  }
+
+  private setActiveTickFromExactPosition(position: number): void {
+    this.model.setActiveTickFromExactPosition(position);
   }
 }
 

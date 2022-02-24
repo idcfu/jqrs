@@ -1,11 +1,11 @@
 import Observable from '../Observable/Observable';
 import IOptions from '../types/IOptions';
+import IModel from './IModel';
 import Model from './Model';
-import { IModel } from './types';
 
 class ModelFactory {
   public static initialize(options: IOptions): IModel {
-    return new Model(new Observable(), options);
+    return new Model(new Observable(), new Observable(), new Observable(), options);
   }
 }
 

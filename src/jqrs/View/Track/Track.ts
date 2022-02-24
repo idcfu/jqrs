@@ -1,33 +1,52 @@
 import Observable from '../../Observable/Observable';
 
 class Track {
-  public readonly observable;
+  public click;
 
-  private readonly root;
-  private readonly element = document.createElement('div');
+  private root;
+  private rootDOMRect;
+  private element = document.createElement('div');
+  private isVertical = false;
 
-  public constructor(observable: Observable, root: HTMLElement) {
-    this.observable = observable;
+  public constructor(click: Observable, root: HTMLElement) {
+    this.click = click;
     this.root = root;
-    this.element.className = 'jqrs__track';
-    this.addEventListener();
+    this.rootDOMRect = root.getBoundingClientRect();
+
+    this.initialize();
   }
 
-  public render(): void {
-    this.root.appendChild(this.element);
+  public setRootDOMRect(rootDOMRect: DOMRect): void {
+    this.rootDOMRect = rootDOMRect;
   }
 
-  private addEventListener(): void {
-    this.element.addEventListener('click', this.handleTrackClick.bind(this));
+  public setIsVertical(isVertical: boolean): void {
+    this.isVertical = isVertical;
   }
 
-  private handleTrackClick({ clientX }: MouseEvent): void {
-    const { left, width } = this.root.getBoundingClientRect();
+  private initialize(): void {
+    const { root, element } = this;
 
-    const position = clientX - left;
-    const positionPercentage = 100 / (width / position);
+    element.classList.add('jqrs__track');
+    element.addEventListener('click', this.handleTrackClick.bind(this));
+    root.append(element);
+  }
 
-    this.observable.notify('handleTrackClick', positionPercentage);
+  private handleTrackClick({ clientX, clientY }: MouseEvent): void {
+    const { click, rootDOMRect } = this;
+    const { top, left, width, height } = rootDOMRect;
+
+    let positionPercentage;
+
+    if (this.isVertical) {
+      const position = clientY - top;
+      positionPercentage = 100 - (100 / (height / position));
+    } else {
+      const position = clientX - left;
+      positionPercentage = 100 / (width / position);
+    }
+
+    click.notify(positionPercentage);
   }
 }
 
