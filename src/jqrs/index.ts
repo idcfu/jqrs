@@ -1,5 +1,6 @@
-import ModelFactory from './Model/ModelFactory';
+import Model from './Model/Model';
 import Presenter from './Presenter/Presenter';
+import Subject from './Subject/Subject';
 import ViewFactory from './View/ViewFactory';
 import IOptions from './types/IOptions';
 import IUpdate from './types/IUpdate';
@@ -14,8 +15,9 @@ declare global {
 (function $($): void {
   const { fn } = $;
   fn.jqrs = function jqrs(options: IOptions, update?: IUpdate): Presenter {
-    const model = ModelFactory.initialize(options);
-    const view = ViewFactory.initialize(this[0]);
+    const subject = new Subject();
+    const model = new Model(subject, options);
+    const view = ViewFactory.initialize(subject, this[0]);
 
     return new Presenter(model, view, update);
   };

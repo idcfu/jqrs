@@ -3,12 +3,12 @@ import View from '../View/View';
 import IUpdate from '../types/IUpdate';
 
 class Presenter {
-  private static update: IUpdate | undefined;
+  private static updateOptions: IUpdate | undefined;
   private model;
   private view;
 
   public constructor(model: IModel, view: View, update?: IUpdate) {
-    Presenter.update = update;
+    Presenter.updateOptions = update;
     this.model = model;
     this.view = view;
 
@@ -52,63 +52,117 @@ class Presenter {
   }
 
   private initialize(): void {
-    this.setObservers();
+    this.setListeners();
     this.model.initialize();
   }
 
-  private setObservers(): void {
-    const { model, view } = this;
+  private setListeners(): void {
+    this.model.subject.attach('optionsUpdate', this.handleOptionsUpdate.bind(this));
+    this.model.subject.attach('isDoubleUpdate', this.handleIsDoubleUpdate.bind(this));
+    this.model.subject.attach('hasTipUpdate', this.handleHasTipUpdate.bind(this));
+    this.model.subject.attach('isVerticalUpdate', this.handleIsVerticalUpdate.bind(this));
+    this.model.subject.attach('scaleUpdate', this.handleScaleUpdate.bind(this));
+    this.model.subject.attach('activeTicksUpdate', this.handleActiveTicksUpdate.bind(this));
 
-    model.optionsUpdate.attach(this.updateOptions.bind(this));
-    model.scaleUpdate.attach(this.updateScale.bind(this));
-    model.activeTicksUpdate.attach(this.updateThumbs.bind(this));
-    view.trackClick.attach(this.setActiveTick.bind(this));
-    view.fromThumbMove.attach(this.setFromFromPosition.bind(this));
-    view.toThumbMove.attach(this.setToFromPosition.bind(this));
-    view.scaleClick.attach(this.setActiveTickFromExactPosition.bind(this));
+    this.view.subject.attach('viewTrackClick', this.handleViewTrackClick.bind(this));
+    this.view.subject.attach('viewFromThumbMove', this.handleViewFromThumbMove.bind(this));
+    this.view.subject.attach('viewToThumbMove', this.handleViewToThumbMove.bind(this));
+    this.view.subject.attach('viewProgressClick', this.handleViewProgressClick.bind(this));
+    this.view.subject.attach('viewScaleClick', this.handleViewScaleClick.bind(this));
   }
 
-  private updateOptions(): void {
-    const { model, view } = this;
-    const { options } = model;
-    const { isDouble, hasTip, isVertical } = options;
-
-    if (Presenter.update) Presenter.update(options);
-    view.updateOptions({ isDouble, hasTip, isVertical });
+  private handleOptionsUpdate(): void {
+    if (Presenter.updateOptions) Presenter.updateOptions(this.model.options);
   }
 
-  private updateScale(): void {
-    const { model, view } = this;
+  private handleIsDoubleUpdate(): void {
     const {
       options: {
-        hasScale,
+        isDouble,
       },
-      scale,
-    } = model;
+      activeTicks: {
+        fromTick: {
+          tick: {
+            position: from,
+          },
+        },
+        toTick: {
+          tick: {
+            position: to,
+          },
+        },
+      },
+    } = this.model;
 
-    view.updateScale(hasScale, scale);
+    this.view.updateDouble(isDouble, from, to);
   }
 
-  private updateThumbs(): void {
-    const { model, view } = this;
-    const { fromTick, toTick } = model.activeTicks;
-
-    view.updateThumbs(fromTick.tick, toTick.tick);
+  private handleHasTipUpdate(): void {
+    this.view.updateTip(this.model.options.hasTip);
   }
 
-  private setActiveTick(position: number): void {
+  private handleIsVerticalUpdate(): void {
+    const {
+      options: {
+        isDouble,
+        hasScale,
+        isVertical,
+      },
+      scale: modelScale,
+      activeTicks: {
+        fromTick: {
+          tick: from,
+        },
+        toTick: {
+          tick: to,
+        },
+      },
+    } = this.model;
+
+    const scale = hasScale && modelScale;
+    this.view.updateDirection(isDouble, isVertical, scale, from, to);
+  }
+
+  private handleScaleUpdate(): void {
+    const scale = this.model.options.hasScale && this.model.scale;
+    this.view.updateScale(scale);
+  }
+
+  private handleActiveTicksUpdate(): void {
+    const {
+      options: {
+        isDouble,
+      },
+      activeTicks: {
+        fromTick: {
+          tick: from,
+        },
+        toTick: {
+          tick: to,
+        },
+      },
+    } = this.model;
+
+    this.view.updateThumbs(isDouble, from, to);
+  }
+
+  private handleViewTrackClick(position: number): void {
     this.model.setActiveTick(position);
   }
 
-  private setFromFromPosition(position: number): void {
+  private handleViewFromThumbMove(position: number): void {
     this.model.setFrom(position, 'position');
   }
 
-  private setToFromPosition(position: number): void {
+  private handleViewToThumbMove(position: number): void {
     this.model.setTo(position, 'position');
   }
 
-  private setActiveTickFromExactPosition(position: number): void {
+  private handleViewProgressClick(position: number): void {
+    this.model.setActiveTick(position);
+  }
+
+  private handleViewScaleClick(position: number): void {
     this.model.setActiveTickFromExactPosition(position);
   }
 }

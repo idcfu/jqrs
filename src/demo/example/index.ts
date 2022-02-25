@@ -7,5 +7,4 @@ new Example(1, {
   isDouble: true,
   hasTip: true,
   hasScale: true,
-  isVertical: true,
 }).initialize();

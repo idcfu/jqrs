@@ -1,17 +1,19 @@
-import Observable from '../../Observable/Observable';
+import Subject from '../../Subject/Subject';
 
 class Thumb {
-  public move;
+  public subject;
+  public rootDOMRect;
   public element = document.createElement('div');
+  public isVertical = false;
 
   private root;
-  private rootDOMRect;
-  private isVertical = false;
+  private type;
 
-  public constructor(move: Observable, root: HTMLElement) {
-    this.move = move;
+  public constructor(subject: Subject, root: HTMLElement, type: 'from' | 'to') {
+    this.subject = subject;
     this.root = root;
     this.rootDOMRect = root.getBoundingClientRect();
+    this.type = type;
 
     this.initialize();
   }
@@ -22,14 +24,6 @@ class Thumb {
 
   public remove(): void {
     this.element.remove();
-  }
-
-  public setRootDOMRect(rootDOMRect: DOMRect): void {
-    this.rootDOMRect = rootDOMRect;
-  }
-
-  public setIsVertical(isVertical: boolean): void {
-    this.isVertical = isVertical;
   }
 
   public setPosition(position: number): void {
@@ -43,10 +37,8 @@ class Thumb {
   }
 
   private initialize(): void {
-    const { element } = this;
-
-    element.classList.add('jqrs__thumb');
-    element.addEventListener('mousedown', this.handleThumbMousedown);
+    this.element.classList.add('jqrs__thumb');
+    this.element.addEventListener('mousedown', this.handleThumbMousedown);
   }
 
   private handleThumbMousedown = (): void => {
@@ -55,20 +47,17 @@ class Thumb {
   };
 
   private handleDocumentMousemove = ({ clientX, clientY }: MouseEvent): void => {
-    const { move, rootDOMRect, isVertical } = this;
-    const { top, left, width, height } = rootDOMRect;
-
     let positionPercentage;
 
-    if (isVertical) {
-      const position = clientY - top;
-      positionPercentage = 100 - (100 / (height / position));
+    if (this.isVertical) {
+      const position = clientY - this.rootDOMRect.top;
+      positionPercentage = 100 - (100 / (this.rootDOMRect.height / position));
     } else {
-      const position = clientX - left;
-      positionPercentage = 100 / (width / position);
+      const position = clientX - this.rootDOMRect.left;
+      positionPercentage = 100 / (this.rootDOMRect.width / position);
     }
 
-    move.notify(positionPercentage);
+    this.subject.notify(`${this.type}ThumbMove`, positionPercentage);
   };
 
   private handleDocumentMouseup(): void {

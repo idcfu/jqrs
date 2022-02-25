@@ -1,63 +1,60 @@
-import Observable from '../../Observable/Observable';
+import Subject from '../../Subject/Subject';
 
 class Progress {
-  public click;
+  public subject;
+  public rootDOMRect;
+  public isVertical = false;
 
   private root;
-  private rootDOMRect;
   private element = document.createElement('div');
-  private isDouble = false;
-  private isVertical = false;
 
-  public constructor(click: Observable, root: HTMLElement) {
-    this.click = click;
+  public constructor(subject: Subject, root: HTMLElement) {
+    this.subject = subject;
     this.root = root;
     this.rootDOMRect = root.getBoundingClientRect();
 
     this.initialize();
   }
 
-  public setRootDOMRect(rootDOMRect: DOMRect): void {
-    this.rootDOMRect = rootDOMRect;
-  }
-
-  public setIsVertical(isVertical: boolean): void {
-    this.isVertical = isVertical;
-  }
-
-  public setPosition(from: number, to: number): void {
-    if (this.isVertical) {
-      this.element.style.bottom = `${from}%`;
-      this.element.style.top = `${to}%`;
-    } else {
-      this.element.style.left = `${from}%`;
-      this.element.style.right = `${to}%`;
-    }
+  public setPosition(isDouble: boolean, from: number, to: number): void {
+    if (isDouble) this.setPositionHelper(from, to);
+    else this.setPositionHelper(0, from);
   }
 
   private initialize(): void {
-    const { root, element } = this;
-
-    element.classList.add('jqrs__progress');
-    element.addEventListener('click', this.handleProgressClick.bind(this));
-    root.append(element);
+    this.element.classList.add('jqrs__progress');
+    this.element.addEventListener('click', this.handleProgressClick.bind(this));
+    this.root.append(this.element);
   }
 
   private handleProgressClick({ clientX, clientY }: MouseEvent): void {
-    const { click, rootDOMRect } = this;
-    const { top, left, width, height } = rootDOMRect;
-
     let positionPercentage;
 
     if (this.isVertical) {
-      const position = clientY - top;
-      positionPercentage = 100 - (100 / (height / position));
+      const position = clientY - this.rootDOMRect.top;
+      positionPercentage = 100 - (100 / (this.rootDOMRect.height / position));
     } else {
-      const position = clientX - left;
-      positionPercentage = 100 / (width / position);
+      const position = clientX - this.rootDOMRect.left;
+      positionPercentage = 100 / (this.rootDOMRect.width / position);
     }
 
-    click.notify(positionPercentage);
+    this.subject.notify('progressClick', positionPercentage);
+  }
+
+  private setPositionHelper(from: number, to: number): void {
+    const newTo = to === 100 ? 0 : 99.9999 - to;
+
+    if (this.isVertical) {
+      this.element.style.left = '';
+      this.element.style.right = '';
+      this.element.style.bottom = `${from}%`;
+      this.element.style.top = `${newTo}%`;
+    } else {
+      this.element.style.bottom = '';
+      this.element.style.top = '';
+      this.element.style.left = `${from}%`;
+      this.element.style.right = `${newTo}%`;
+    }
   }
 }
 

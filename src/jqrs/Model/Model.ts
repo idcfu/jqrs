@@ -1,4 +1,4 @@
-import Observable from '../Observable/Observable';
+import Subject from '../Subject/Subject';
 import IActiveTick from '../types/IActiveTick';
 import IActiveTicks from '../types/IActiveTicks';
 import IOptions from '../types/IOptions';
@@ -6,204 +6,176 @@ import ITick from '../types/ITick';
 import IModel from './IModel';
 
 class Model implements IModel {
-  public optionsUpdate;
-  public scaleUpdate;
-  public activeTicksUpdate;
+  public subject;
   public options;
   public scale;
   public activeTicks;
 
-  public constructor(
-    optionsUpdate: Observable,
-    scaleUpdate: Observable,
-    activeTicksUpdate: Observable,
-    options: IOptions,
-  ) {
-    this.optionsUpdate = optionsUpdate;
-    this.scaleUpdate = scaleUpdate;
-    this.activeTicksUpdate = activeTicksUpdate;
+  public constructor(subject: Subject, options: IOptions) {
+    this.subject = subject;
     this.options = Model.createOptions(options);
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
   }
 
   public initialize(): void {
-    this.optionsUpdate.notify();
-    this.scaleUpdate.notify();
-    this.activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('isDoubleUpdate');
+    this.subject.notify('hasTipUpdate');
+    this.subject.notify('isVerticalUpdate');
+    this.subject.notify('scaleUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setMin(min: number): void {
-    const { optionsUpdate, scaleUpdate, activeTicksUpdate, options } = this;
-    const { max, step } = options;
-
     const newMin = Model.validateNumber(min, 'min');
-    const range = Model.roundValue(max - newMin);
+    const range = Model.roundValue(this.options.max - newMin);
 
-    if (newMin >= max) {
-      options.step = 0.1;
-      options.min = Model.roundValue(max - options.step);
-    } else if (step > range) {
-      options.step = range;
-      options.min = newMin;
+    if (newMin >= this.options.max) {
+      this.options.step = 0.0001;
+      this.options.min = Model.roundValue(this.options.max - this.options.step);
+    } else if (this.options.step > range) {
+      this.options.step = range;
+      this.options.min = newMin;
     } else {
-      options.min = newMin;
+      this.options.min = newMin;
     }
 
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
 
-    optionsUpdate.notify();
-    scaleUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('scaleUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setMax(max: number): void {
-    const { optionsUpdate, scaleUpdate, activeTicksUpdate, options } = this;
-    const { min, step } = options;
-
     const newMax = Model.validateNumber(max, 'max');
-    const range = Model.roundValue(newMax - min);
+    const range = Model.roundValue(newMax - this.options.min);
 
-    if (newMax <= min) {
-      options.step = 0.1;
-      options.max = Model.roundValue(min + options.step);
-    } else if (step > range) {
-      options.step = range;
-      options.max = newMax;
+    if (newMax <= this.options.min) {
+      this.options.step = 0.0001;
+      this.options.max = Model.roundValue(this.options.min + this.options.step);
+    } else if (this.options.step > range) {
+      this.options.step = range;
+      this.options.max = newMax;
     } else {
-      options.max = newMax;
+      this.options.max = newMax;
     }
 
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
 
-    optionsUpdate.notify();
-    scaleUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('scaleUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setStep(step: number): void {
-    const { optionsUpdate, scaleUpdate, activeTicksUpdate, options } = this;
-    const { min, max } = options;
-
     const newStep = Model.validateNumber(step, 'step');
-    const range = Model.roundValue(max - min);
+    const range = Model.roundValue(this.options.max - this.options.min);
 
-    if (newStep <= 0) options.step = 0.1;
-    else if (newStep > range) options.step = range;
-    else options.step = newStep;
+    if (newStep <= 0) this.options.step = 0.0001;
+    else if (newStep > range) this.options.step = range;
+    else this.options.step = newStep;
 
     this.scale = this.createScale();
     this.activeTicks = this.createActiveTicks();
 
-    optionsUpdate.notify();
-    scaleUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('scaleUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setFrom(from: number, type: keyof ITick): void {
-    const { optionsUpdate, activeTicksUpdate, options, activeTicks } = this;
-    const { toTick } = activeTicks;
-
     const newFrom = Model.validateNumber(from, 'from');
+    const highestIndex = this.activeTicks.toTick.index - 1;
 
-    activeTicks.fromTick = this.createActiveTick(newFrom, 0, toTick.index - 1, type);
-    options.from = activeTicks.fromTick.tick.value;
+    this.activeTicks.fromTick = this.createActiveTick(newFrom, 0, highestIndex, type);
+    this.options.from = this.activeTicks.fromTick.tick.value;
 
-    optionsUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setTo(to: number, type: keyof ITick): void {
-    const { optionsUpdate, activeTicksUpdate, options, scale, activeTicks } = this;
-    const { fromTick } = activeTicks;
-
     const newTo = Model.validateNumber(to, 'to');
+    const lowestIndex = this.activeTicks.fromTick.index + 1;
+    const highestIndex = this.scale.length - 1;
 
-    activeTicks.toTick = this.createActiveTick(newTo, fromTick.index + 1, scale.length - 1, type);
-    options.to = activeTicks.toTick.tick.value;
+    this.activeTicks.toTick = this.createActiveTick(newTo, lowestIndex, highestIndex, type);
+    this.options.to = this.activeTicks.toTick.tick.value;
 
-    optionsUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setIsDouble(isDouble: boolean): void {
     Model.validateBoolean(isDouble, 'isDouble');
     this.options.isDouble = isDouble;
 
-    this.optionsUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('isDoubleUpdate');
   }
 
   public setHasTip(hasTip: boolean): void {
     Model.validateBoolean(hasTip, 'hasTip');
     this.options.hasTip = hasTip;
 
-    this.optionsUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('hasTipUpdate');
   }
 
   public setHasScale(hasScale: boolean): void {
     Model.validateBoolean(hasScale, 'hasScale');
     this.options.hasScale = hasScale;
 
-    this.optionsUpdate.notify();
-    this.scaleUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('scaleUpdate');
   }
 
   public setIsVertical(isVertical: boolean): void {
     Model.validateBoolean(isVertical, 'isVertical');
     this.options.isVertical = isVertical;
 
-    this.optionsUpdate.notify();
-    this.scaleUpdate.notify();
-    this.activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('isVerticalUpdate');
   }
 
   public setActiveTick(position: number): void {
-    const { optionsUpdate, activeTicksUpdate, options, scale, activeTicks } = this;
-    const { fromTick, toTick } = activeTicks;
-
     const closest = this.findClosestTick(position, 'position');
-    const tick = this.createActiveTickHelper(scale.indexOf(closest));
+    const tick = this.createActiveTickHelper(this.scale.indexOf(closest));
 
-    const differenceWithFrom = Math.abs(position - fromTick.tick.position);
-    const differenceWithTo = Math.abs(position - toTick.tick.position);
+    const fromPosition = this.activeTicks.fromTick.tick.position;
+    const toPosition = this.activeTicks.toTick.tick.position;
+    this.setActiveTickHelper(position, fromPosition, toPosition, tick);
 
-    const closestToTick = differenceWithFrom < differenceWithTo ? 'from' : 'to';
-
-    activeTicks[`${closestToTick}Tick`] = tick;
-    options[closestToTick] = tick.tick.value;
-
-    optionsUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   public setActiveTickFromExactPosition(position: number): void {
-    const { optionsUpdate, activeTicksUpdate, options, scale, activeTicks } = this;
-    const { fromTick, toTick } = activeTicks;
-
-    const tickIndex = scale.findIndex(({ position: currentPosition }) => (
+    const tickIndex = this.scale.findIndex(({ position: currentPosition }) => (
       currentPosition === position
     ));
 
     const tick = this.createActiveTickHelper(tickIndex);
-    const isExactBetween = tickIndex - 1 === fromTick.index && tickIndex + 1 === toTick.index;
+
+    const isPreviousFrom = tickIndex - 1 === this.activeTicks.fromTick.index;
+    const isNextTo = tickIndex + 1 === this.activeTicks.toTick.index;
+    const isExactBetween = isPreviousFrom && isNextTo;
 
     if (isExactBetween) {
-      activeTicks.toTick = tick;
-      options.to = tick.tick.value;
+      this.activeTicks.toTick = tick;
+      this.options.to = tick.tick.value;
     } else {
-      const differenceWithFrom = Math.abs(tickIndex - fromTick.index);
-      const differenceWithTo = Math.abs(tickIndex - toTick.index);
-
-      const closestToTick = differenceWithFrom < differenceWithTo ? 'from' : 'to';
-
-      activeTicks[`${closestToTick}Tick`] = tick;
-      options[closestToTick] = tick.tick.value;
+      const fromIndex = this.activeTicks.fromTick.index;
+      const toIndex = this.activeTicks.toTick.index;
+      this.setActiveTickHelper(tickIndex, fromIndex, toIndex, tick);
     }
 
-    optionsUpdate.notify();
-    activeTicksUpdate.notify();
+    this.subject.notify('optionsUpdate');
+    this.subject.notify('activeTicksUpdate');
   }
 
   private static createOptions(options: IOptions): Required<IOptions> {
@@ -242,7 +214,7 @@ class Model implements IModel {
     to = this.validateNumber(to, 'to');
 
     if (min >= max) {
-      step = 0.1;
+      step = 0.0001;
       min = Model.roundValue(max - step);
     }
 
@@ -278,46 +250,38 @@ class Model implements IModel {
   }
 
   private createScale(): ITick[] {
-    const { options } = this;
-    const { min, max } = options;
-    let { step } = options;
-
-    let intervals = Model.roundValue(max - min) / step;
+    let intervals = Model.roundValue(this.options.max - this.options.min) / this.options.step;
 
     if (intervals > 1000) {
       intervals = 1000;
-      step = Model.roundValue((max - min) / 1000);
-      options.step = step;
+      this.options.step = Model.roundValue((this.options.max - this.options.min) / 1000);
     }
 
     const intervalPercentage = Model.roundPosition(100 / intervals);
 
     const scale: ITick[] = [];
     let position = 0;
-    let value = min;
+    let value = this.options.min;
 
     for (let index = 0; index < intervals; index += 1) {
       scale.push({ position, value });
       position = Model.roundPosition(position + intervalPercentage);
-      value = Model.roundValue(value + step);
+      value = Model.roundValue(value + this.options.step);
     }
 
-    scale.push({ position: 100, value: max });
+    scale.push({ position: 100, value: this.options.max });
 
     return scale;
   }
 
   private createActiveTicks(): IActiveTicks {
-    const { options, scale } = this;
-    const { from, to } = options;
-
-    const toTick = this.createActiveTick(to, 1, scale.length - 1, 'value');
-    let fromTick = this.createActiveTick(from, 0, scale.length - 2, 'value');
+    const toTick = this.createActiveTick(this.options.to, 1, this.scale.length - 1, 'value');
+    let fromTick = this.createActiveTick(this.options.from, 0, this.scale.length - 2, 'value');
 
     if (toTick === fromTick) fromTick = this.createActiveTickHelper(toTick.index - 1);
 
-    options.from = fromTick.tick.value;
-    options.to = toTick.tick.value;
+    this.options.from = fromTick.tick.value;
+    this.options.to = toTick.tick.value;
 
     return { fromTick, toTick };
   }
@@ -328,17 +292,15 @@ class Model implements IModel {
     highestIndex: number,
     type: keyof ITick,
   ): IActiveTick {
-    const { scale } = this;
-
     let tick;
 
-    if (value <= scale[lowestIndex][type]) {
+    if (value <= this.scale[lowestIndex][type]) {
       tick = this.createActiveTickHelper(lowestIndex);
-    } else if (value >= scale[highestIndex][type]) {
+    } else if (value >= this.scale[highestIndex][type]) {
       tick = this.createActiveTickHelper(highestIndex);
     } else {
       const closest = this.findClosestTick(value, type);
-      tick = this.createActiveTickHelper(scale.indexOf(closest));
+      tick = this.createActiveTickHelper(this.scale.indexOf(closest));
     }
 
     return tick;
@@ -351,15 +313,22 @@ class Model implements IModel {
     };
   }
 
-  private findClosestTick(value: number, type: keyof ITick): ITick {
-    const { scale } = this;
+  private setActiveTickHelper(value: number, from: number, to: number, tick: IActiveTick): void {
+    const differenceWithFrom = Math.abs(value - from);
+    const differenceWithTo = Math.abs(value - to);
+    const closestToTick = differenceWithFrom < differenceWithTo ? 'from' : 'to';
 
+    this.activeTicks[`${closestToTick}Tick`] = tick;
+    this.options[closestToTick] = tick.tick.value;
+  }
+
+  private findClosestTick(value: number, type: keyof ITick): ITick {
     let first = 0;
-    let last = scale.length - 1;
+    let last = this.scale.length - 1;
 
     while (first <= last) {
       const middle = Math.ceil((first + last) / 2);
-      const middleTick = scale[middle];
+      const middleTick = this.scale[middle];
 
       if (value === middleTick[type]) return middleTick;
 
@@ -367,10 +336,10 @@ class Model implements IModel {
       else first = middle + 1;
     }
 
-    const firstTick = scale[last];
+    const firstTick = this.scale[last];
     const differenceWithFirst = Math.abs(value - firstTick[type]);
 
-    const lastTick = scale[first];
+    const lastTick = this.scale[first];
     const differenceWithLast = Math.abs(value - lastTick[type]);
 
     const closest = differenceWithFirst < differenceWithLast ? firstTick : lastTick;

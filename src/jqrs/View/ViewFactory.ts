@@ -1,4 +1,4 @@
-import Observable from '../Observable/Observable';
+import Subject from '../Subject/Subject';
 import View from './View';
 import Progress from './Progress/Progress';
 import Scale from './Scale/Scale';
@@ -7,20 +7,17 @@ import Tip from './Tip/Tip';
 import Track from './Track/Track';
 
 class ViewFactory {
-  public static initialize(element: HTMLElement): View {
-    const track = new Track(new Observable(), element);
-    const fromThumb = new Thumb(new Observable(), element);
-    const toThumb = new Thumb(new Observable(), element);
+  public static initialize(subject: Subject, element: HTMLElement): View {
+    const track = new Track(subject, element);
+    const fromThumb = new Thumb(subject, element, 'from');
+    const toThumb = new Thumb(subject, element, 'to');
     const fromTip = new Tip(fromThumb.element);
     const toTip = new Tip(toThumb.element);
-    const progress = new Progress(new Observable(), element);
-    const scale = new Scale(new Observable(), element);
+    const progress = new Progress(subject, element);
+    const scale = new Scale(subject, element);
 
     return new View(
-      new Observable(),
-      new Observable(),
-      new Observable(),
-      new Observable(),
+      subject,
       element,
       track,
       fromThumb,

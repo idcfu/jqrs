@@ -67,41 +67,39 @@ class Example {
   private handleExampleChange({ target }: Event): void {
     if (!(target instanceof HTMLInputElement)) throw new Error("'target' must be an instance of 'HTMLInputElement'");
 
-    const { elements, plugin } = this;
-
     switch (target) {
-      case elements.min:
-        plugin.setMin(Number(target.value));
+      case this.elements.min:
+        this.plugin.setMin(Number(target.value));
         break;
-      case elements.max:
-        plugin.setMax(Number(target.value));
+      case this.elements.max:
+        this.plugin.setMax(Number(target.value));
         break;
-      case elements.step:
-        plugin.setStep(Number(target.value));
+      case this.elements.step:
+        this.plugin.setStep(Number(target.value));
         break;
-      case elements.from:
-        plugin.setFrom(Number(target.value));
+      case this.elements.from:
+        this.plugin.setFrom(Number(target.value));
         break;
-      case elements.to:
-        plugin.setTo(Number(target.value));
+      case this.elements.to:
+        this.plugin.setTo(Number(target.value));
         break;
-      case elements.double:
-        plugin.setIsDouble(target.checked);
+      case this.elements.double:
+        this.plugin.setIsDouble(target.checked);
         break;
-      case elements.tip:
-        plugin.setHasTip(target.checked);
+      case this.elements.tip:
+        this.plugin.setHasTip(target.checked);
         break;
-      case elements.scale:
-        plugin.setHasScale(target.checked);
+      case this.elements.scale:
+        this.plugin.setHasScale(target.checked);
         break;
-      case elements.vertical: {
-        const exampleJqrs: HTMLElement | null = elements.example.querySelector('.js-example__jqrs');
+      case this.elements.vertical: {
+        const exampleJqrs: HTMLElement | null = this.elements.example.querySelector('.js-example__jqrs');
         if (!exampleJqrs) throw new Error("'exampleJqrs' is 'null'");
 
         if (target.checked) exampleJqrs.classList.add('example__jqrs_vertical');
         else exampleJqrs.classList.remove('example__jqrs_vertical');
 
-        plugin.setIsVertical(target.checked);
+        this.plugin.setIsVertical(target.checked);
       }
         break;
       default:
@@ -109,25 +107,23 @@ class Example {
   }
 
   private update(options: Required<IOptions>): void {
-    const { elements } = this;
+    this.elements.min.value = String(options.min);
+    this.elements.max.value = String(options.max);
+    this.elements.step.value = String(options.step);
 
-    elements.min.value = String(options.min);
-    elements.max.value = String(options.max);
-    elements.step.value = String(options.step);
+    this.elements.from.min = String(options.min);
+    this.elements.from.step = String(options.step);
+    this.elements.from.value = String(options.from);
 
-    elements.from.min = String(options.min);
-    elements.from.step = String(options.step);
-    elements.from.value = String(options.from);
+    this.elements.to.min = String(options.min);
+    this.elements.to.step = String(options.step);
+    this.elements.to.value = String(options.to);
+    this.elements.to.disabled = !options.isDouble;
 
-    elements.to.min = String(options.min);
-    elements.to.step = String(options.step);
-    elements.to.value = String(options.to);
-    elements.to.disabled = !options.isDouble;
-
-    elements.double.checked = options.isDouble;
-    elements.tip.checked = options.hasTip;
-    elements.scale.checked = options.hasScale;
-    elements.vertical.checked = options.isVertical;
+    this.elements.double.checked = options.isDouble;
+    this.elements.tip.checked = options.hasTip;
+    this.elements.scale.checked = options.hasScale;
+    this.elements.vertical.checked = options.isVertical;
   }
 }
 

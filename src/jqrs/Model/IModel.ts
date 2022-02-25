@@ -1,18 +1,14 @@
-import Observable from '../Observable/Observable';
+import Subject from '../Subject/Subject';
 import IActiveTicks from '../types/IActiveTicks';
 import IOptions from '../types/IOptions';
 import ITick from '../types/ITick';
 
 interface IModel {
-  optionsUpdate: Observable;
-  scaleUpdate: Observable;
-  activeTicksUpdate: Observable;
+  subject: Subject;
   options: Required<IOptions>;
   scale: ITick[];
   activeTicks: IActiveTicks;
   initialize(): void;
-  setActiveTick(position: number): void;
-  setActiveTickFromExactPosition(position: number): void;
   setMin(min: number): void;
   setMax(max: number): void;
   setStep(step: number): void;
@@ -22,6 +18,8 @@ interface IModel {
   setHasTip(hasTip: boolean): void;
   setHasScale(hasScale: boolean): void;
   setIsVertical(isVertical: boolean): void;
+  setActiveTick(position: number): void;
+  setActiveTickFromExactPosition(position: number): void;
 }
 
 export default IModel;
