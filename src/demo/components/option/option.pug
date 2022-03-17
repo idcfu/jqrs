@@ -1,0 +1,9 @@
+mixin option(name, type, hasStep)
+  label.option= name
+    input(
+      class=`option__value option__value_type_${name} js-option__value_type_${name}`
+      type=type
+      step=(hasStep && 'any')
+    )
+    if (type === 'checkbox')
+      span.option__tick L

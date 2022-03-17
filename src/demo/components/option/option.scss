@@ -1,0 +1,56 @@
+.option {
+  position: relative;
+  cursor: pointer;
+}
+
+.option__value_type_min,
+.option__value_type_max,
+.option__value_type_step,
+.option__value_type_from,
+.option__value_type_to {
+  width: 70px;
+  margin-left: 6px;
+  padding: 2px 2px 2px 4px;
+  font-size: 1.4rem;
+  line-height: inherit;
+  color: inherit;
+  border: 2px solid #aaa;
+
+  &:focus-visible {
+    outline: 2px solid #444;
+    outline-offset: -2px;
+  }
+}
+
+.option__value_type_double,
+.option__value_type_tip,
+.option__value_type_scale,
+.option__value_type_vertical {
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 6px;
+  vertical-align: text-bottom;
+  border: 1px solid #aaa;
+  cursor: inherit;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 1px solid #444;
+    outline-offset: -1px;
+  }
+
+  &:checked + .option__tick {
+    display: block;
+  }
+}
+
+.option__tick {
+  position: absolute;
+  top: 7px;
+  right: 4px;
+  display: none;
+  font-size: 1.4rem;
+  line-height: 0;
+  font-family: Arial, sans-serif;
+  transform: scaleX(-1) rotate(-35deg);
+}

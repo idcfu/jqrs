@@ -1,5 +1,6 @@
+import debounce from '../../helpers/debounce';
 import Subject from '../Subject/Subject';
-import ITick from '../types/ITick';
+import ITick from '../../types/ITick';
 import Progress from './Progress/Progress';
 import Scale from './Scale/Scale';
 import Thumb from './Thumb/Thumb';
@@ -43,11 +44,11 @@ class View {
     this.initialize();
   }
 
-  public updateDouble(isDouble: boolean, from: number, to: number): void {
+  public updateDouble(isDouble: boolean, from: ITick, to: ITick): void {
     if (isDouble) this.toThumb.render();
     else this.toThumb.remove();
 
-    this.progress.setPosition(isDouble, from, to);
+    this.updateThumbs(isDouble, from, to);
   }
 
   public updateTip(hasTip: boolean): void {
@@ -60,17 +61,15 @@ class View {
     }
   }
 
-  public updateDirection(
+  public updateVertical(
     isDouble: boolean,
     isVertical: boolean,
     scale: false | ITick[],
     from: ITick,
     to: ITick,
   ): void {
-    if (isVertical) this.element.classList.add('jqrs_vertical');
-    else this.element.classList.remove('jqrs_vertical');
-
-    this.setDOMRect();
+    if (isVertical) this.element.classList.add('jqrs_is-vertical');
+    else this.element.classList.remove('jqrs_is-vertical');
 
     this.track.isVertical = isVertical;
     this.fromThumb.isVertical = isVertical;
@@ -99,44 +98,37 @@ class View {
 
   private initialize(): void {
     this.fromThumb.render();
-    this.setListeners();
+
+    this.track.subject.attach('trackPointerDown', this.handleTrackPointerDown.bind(this));
+    this.fromThumb.subject.attach('fromThumbPointermove', this.handleFromThumbPointermove.bind(this));
+    this.toThumb.subject.attach('toThumbPointermove', this.handleToThumbPointermove.bind(this));
+    this.progress.subject.attach('progressPointerDown', this.handleProgressPointerDown.bind(this));
+    this.scale.subject.attach('scalePointerDown', this.handleScalePointerDown.bind(this));
+    window.addEventListener('resize', debounce(this.handleWindowResize.bind(this), 100));
   }
 
-  private setListeners(): void {
-    this.track.subject.attach('trackClick', this.handleTrackClick.bind(this));
-    this.fromThumb.subject.attach('fromThumbMove', this.handleFromThumbMove.bind(this));
-    this.toThumb.subject.attach('toThumbMove', this.handleToThumbMove.bind(this));
-    this.progress.subject.attach('progressClick', this.handleProgressClick.bind(this));
-    this.scale.subject.attach('scaleClick', this.handleScaleClick.bind(this));
+  private handleTrackPointerDown(position: number): void {
+    this.subject.notify('viewTrackPointerDown', position);
   }
 
-  private handleTrackClick(position: number): void {
-    this.subject.notify('viewTrackClick', position);
+  private handleFromThumbPointermove(position: number): void {
+    this.subject.notify('viewFromThumbPointermove', position);
   }
 
-  private handleFromThumbMove(position: number): void {
-    this.subject.notify('viewFromThumbMove', position);
+  private handleToThumbPointermove(position: number): void {
+    this.subject.notify('viewToThumbPointermove', position);
   }
 
-  private handleToThumbMove(position: number): void {
-    this.subject.notify('viewToThumbMove', position);
+  private handleProgressPointerDown(position: number): void {
+    this.subject.notify('viewProgressPointerDown', position);
   }
 
-  private handleProgressClick(position: number): void {
-    this.subject.notify('viewProgressClick', position);
+  private handleScalePointerDown(position: number): void {
+    this.subject.notify('viewScalePointerDown', position);
   }
 
-  private handleScaleClick(position: number): void {
-    this.subject.notify('viewScaleClick', position);
-  }
-
-  private setDOMRect(): void {
-    const DOMRect = this.element.getBoundingClientRect();
-
-    this.track.rootDOMRect = DOMRect;
-    this.fromThumb.rootDOMRect = DOMRect;
-    this.toThumb.rootDOMRect = DOMRect;
-    this.progress.rootDOMRect = DOMRect;
+  private handleWindowResize(): void {
+    this.scale.fitScale();
   }
 }
 

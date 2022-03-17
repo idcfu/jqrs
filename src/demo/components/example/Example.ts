@@ -1,4 +1,4 @@
-import IOptions from '../../jqrs/types/IOptions';
+import IOptions from '../../../types/IOptions';
 
 interface IElements {
   example: HTMLElement;
@@ -28,44 +28,44 @@ class Example {
   }
 
   private static findElements(id: number): IElements {
-    const example: HTMLElement | null = document.querySelector(`#js-example-${id}`);
-    if (!example) throw new Error("'example' is 'null'");
+    const example = document.querySelector(`#js-example-${id}`) as HTMLElement;
+    if (!(example instanceof HTMLElement)) throw new Error(`'${example}' is not a HTML element`);
 
-    const jqrs: HTMLElement | null = example.querySelector('.js-jqrs');
-    if (!jqrs) throw new Error("'jqrs' is 'null'");
+    const jqrs = example.querySelector('.js-jqrs') as HTMLElement;
+    if (!(jqrs instanceof HTMLElement)) throw new Error(`'${jqrs}' is not a HTML element`);
 
-    const min: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_min');
-    if (!min) throw new Error("'min' is 'null'");
+    const min = example.querySelector('.js-option__value_type_min') as HTMLInputElement;
+    if (!(min instanceof HTMLInputElement)) throw new Error(`'${min}' is not an 'input' element`);
 
-    const max: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_max');
-    if (!max) throw new Error("'max' is 'null'");
+    const max = example.querySelector('.js-option__value_type_max') as HTMLInputElement;
+    if (!(max instanceof HTMLInputElement)) throw new Error(`'${max}' is not an 'input' element`);
 
-    const step: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_step');
-    if (!step) throw new Error("'step' is 'null'");
+    const step = example.querySelector('.js-option__value_type_step') as HTMLInputElement;
+    if (!(step instanceof HTMLInputElement)) throw new Error(`'${step}' is not an 'input' element`);
 
-    const from: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_from');
-    if (!from) throw new Error("'from' is 'null'");
+    const from = example.querySelector('.js-option__value_type_from') as HTMLInputElement;
+    if (!(from instanceof HTMLInputElement)) throw new Error(`'${from}' is not an 'input' element`);
 
-    const to: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_to');
-    if (!to) throw new Error("'to' is 'null'");
+    const to = example.querySelector('.js-option__value_type_to') as HTMLInputElement;
+    if (!(to instanceof HTMLInputElement)) throw new Error(`'${to}' is not an 'input' element`);
 
-    const double: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_double');
-    if (!double) throw new Error("'double' is 'null'");
+    const double = example.querySelector('.js-option__value_type_double') as HTMLInputElement;
+    if (!(double instanceof HTMLInputElement)) throw new Error(`'${double}' is not an 'input' element`);
 
-    const tip: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_tip');
-    if (!tip) throw new Error("'tip' is 'null'");
+    const tip = example.querySelector('.js-option__value_type_tip') as HTMLInputElement;
+    if (!(tip instanceof HTMLInputElement)) throw new Error(`'${tip}' is not an 'input' element`);
 
-    const scale: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_scale');
-    if (!scale) throw new Error("'scale' is 'null'");
+    const scale = example.querySelector('.js-option__value_type_scale') as HTMLInputElement;
+    if (!(scale instanceof HTMLInputElement)) throw new Error(`'${scale}' is not an 'input' element`);
 
-    const vertical: HTMLInputElement | null = example.querySelector('.js-example__option-value_type_vertical');
-    if (!vertical) throw new Error("'vertical' is 'null'");
+    const vertical = example.querySelector('.js-option__value_type_vertical') as HTMLInputElement;
+    if (!(vertical instanceof HTMLInputElement)) throw new Error(`'${vertical}' is not an 'input' element`);
 
     return { example, jqrs, min, max, step, from, to, double, tip, scale, vertical };
   }
 
   private handleExampleChange({ target }: Event): void {
-    if (!(target instanceof HTMLInputElement)) throw new Error("'target' must be an instance of 'HTMLInputElement'");
+    if (!(target instanceof HTMLInputElement)) throw new Error(`'${target}' is not an 'input' element`);
 
     switch (target) {
       case this.elements.min:
@@ -93,11 +93,11 @@ class Example {
         this.plugin.setHasScale(target.checked);
         break;
       case this.elements.vertical: {
-        const exampleJqrs: HTMLElement | null = this.elements.example.querySelector('.js-example__jqrs');
-        if (!exampleJqrs) throw new Error("'exampleJqrs' is 'null'");
+        const exampleJqrs = this.elements.example.querySelector('.js-example__jqrs') as HTMLElement;
+        if (!(exampleJqrs instanceof HTMLElement)) throw new Error("'exampleJqrs' is not a HTML element");
 
-        if (target.checked) exampleJqrs.classList.add('example__jqrs_vertical');
-        else exampleJqrs.classList.remove('example__jqrs_vertical');
+        if (target.checked) exampleJqrs.classList.add('example__jqrs_is-vertical');
+        else exampleJqrs.classList.remove('example__jqrs_is-vertical');
 
         this.plugin.setIsVertical(target.checked);
       }

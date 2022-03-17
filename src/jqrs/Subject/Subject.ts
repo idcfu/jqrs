@@ -1,51 +1,47 @@
 type IType =
   'activeTicksUpdate'
-  | 'fromThumbMove'
+  | 'fromThumbPointermove'
   | 'hasTipUpdate'
   | 'isDoubleUpdate'
   | 'isVerticalUpdate'
   | 'optionsUpdate'
-  | 'progressClick'
-  | 'scaleClick'
+  | 'progressPointerDown'
+  | 'scalePointerDown'
   | 'scaleUpdate'
-  | 'toThumbMove'
-  | 'trackClick'
-  | 'viewFromThumbMove'
-  | 'viewProgressClick'
-  | 'viewScaleClick'
-  | 'viewToThumbMove'
-  | 'viewTrackClick';
+  | 'toThumbPointermove'
+  | 'trackPointerDown'
+  | 'viewFromThumbPointermove'
+  | 'viewProgressPointerDown'
+  | 'viewScalePointerDown'
+  | 'viewToThumbPointermove'
+  | 'viewTrackPointerDown';
 
 class Subject {
   private events: Record<IType, Function[]> = {
     activeTicksUpdate: [],
-    fromThumbMove: [],
+    fromThumbPointermove: [],
     hasTipUpdate: [],
     isDoubleUpdate: [],
     isVerticalUpdate: [],
     optionsUpdate: [],
-    progressClick: [],
-    scaleClick: [],
+    progressPointerDown: [],
+    scalePointerDown: [],
     scaleUpdate: [],
-    toThumbMove: [],
-    trackClick: [],
-    viewFromThumbMove: [],
-    viewProgressClick: [],
-    viewScaleClick: [],
-    viewToThumbMove: [],
-    viewTrackClick: [],
+    toThumbPointermove: [],
+    trackPointerDown: [],
+    viewFromThumbPointermove: [],
+    viewProgressPointerDown: [],
+    viewScalePointerDown: [],
+    viewToThumbPointermove: [],
+    viewTrackPointerDown: [],
   };
 
-  public attach(type: IType, observer: Function): void {
-    this.events[type].push(observer);
-  }
-
-  public detach(type: IType, observer: Function): void {
-    this.events[type].filter((currentObserver) => currentObserver !== observer);
+  public attach(type: IType, callback: Function): void {
+    this.events[type].push(callback);
   }
 
   public notify(type: IType, data?: number): void {
-    this.events[type].forEach((observer) => observer(data));
+    this.events[type].forEach((callback) => callback(data));
   }
 }
 

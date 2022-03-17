@@ -9,15 +9,25 @@ html {
   font-size: 62.5%;
 }
 
-body {
+.demo {
+  min-width: 320px;
   margin: 0;
+  padding: 50px 0 50px;
   font-size: 1.6rem;
   line-height: 1.5;
   color: #444;
+
+  @media screen and (max-width: 639.98px) {
+    padding: 20px 20px 8px;
+  }
 }
 
-h1 {
-  margin: 30px 0 100px;
+.demo__heading {
+  margin: 0 0 12px;
   font-size: 3rem;
   text-align: center;
+}
+
+.demo__example {
+  margin-top: 188px;
 }

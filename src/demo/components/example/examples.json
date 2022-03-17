@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "from": 0,
+    "to": 100,
+    "isDouble": false,
+    "hasTip": false,
+    "hasScale": false,
+    "isVertical": false
+  },
+
+  {
+    "id": 2,
+    "min": -50,
+    "max": 50,
+    "step": 10,
+    "from": -30,
+    "to": 30,
+    "isDouble": true,
+    "hasTip": true,
+    "hasScale": true,
+    "isVertical": false
+  },
+
+  {
+    "id": 3,
+    "min": -25,
+    "max": 25,
+    "step": 5,
+    "from": -15,
+    "to": 15,
+    "isDouble": true,
+    "hasTip": true,
+    "hasScale": true,
+    "isVertical": true
+  }
+]

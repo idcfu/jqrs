@@ -2,4 +2,4 @@ const importAll = function (requireContext: __WebpackModuleApi.RequireContext): 
   requireContext.keys().forEach(requireContext);
 };
 
-importAll(require.context('.', true, /^(?!.*(?:test.ts$)).*\.(scss|ts)$/));
+importAll(require.context('.', true, /\.(scss|ts)$/));

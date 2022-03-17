@@ -2,7 +2,6 @@ import Subject from '../../Subject/Subject';
 
 class Track {
   public subject;
-  public rootDOMRect;
   public isVertical = false;
 
   private root;
@@ -11,29 +10,29 @@ class Track {
   public constructor(subject: Subject, root: HTMLElement) {
     this.subject = subject;
     this.root = root;
-    this.rootDOMRect = root.getBoundingClientRect();
 
     this.initialize();
   }
 
   private initialize(): void {
     this.element.classList.add('jqrs__track');
-    this.element.addEventListener('click', this.handleTrackClick.bind(this));
+    this.element.addEventListener('pointerdown', this.handleTrackPointerDown.bind(this));
     this.root.append(this.element);
   }
 
-  private handleTrackClick({ clientX, clientY }: MouseEvent): void {
+  private handleTrackPointerDown({ clientX, clientY }: PointerEvent): void {
+    const rootDOMRect = this.root.getBoundingClientRect();
     let positionPercentage;
 
     if (this.isVertical) {
-      const position = clientY - this.rootDOMRect.top;
-      positionPercentage = 100 - (100 / (this.rootDOMRect.height / position));
+      const position = clientY - rootDOMRect.top;
+      positionPercentage = 100 - (100 / (rootDOMRect.height / position));
     } else {
-      const position = clientX - this.rootDOMRect.left;
-      positionPercentage = 100 / (this.rootDOMRect.width / position);
+      const position = clientX - rootDOMRect.left;
+      positionPercentage = 100 / (rootDOMRect.width / position);
     }
 
-    this.subject.notify('trackClick', positionPercentage);
+    this.subject.notify('trackPointerDown', positionPercentage);
   }
 }
 

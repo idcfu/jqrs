@@ -8,8 +8,9 @@
   color: #444;
   cursor: pointer;
   user-select: none;
+  touch-action: none;
 
-  &_vertical {
+  &_is-vertical {
     width: 10px;
     height: 100%;
 
@@ -42,7 +43,7 @@
     }
 
     .jqrs__tick {
-      transform: translate(-100%, -50%);
+      transform: translate(-100%, -70%);
     }
   }
 }
@@ -59,6 +60,10 @@
   height: 26px;
   background-color: #444;
   transform: translateX(-5px);
+}
+
+.jqrs__thumb_is-active {
+  z-index: 1;
 }
 
 .jqrs__tip {

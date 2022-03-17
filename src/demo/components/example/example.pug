@@ -1,0 +1,27 @@
+include ../option/option.pug
+
+mixin example(id, isVertical)
+  .example(id=`js-example-${id}`)
+    .example__jqrs.js-example__jqrs(class=(isVertical && 'example__jqrs_is-vertical'))
+      .jqrs.js-jqrs
+    .example__options
+      .example__options-row
+        .example__option
+          +option('min', 'number', true)
+        .example__option
+          +option('max', 'number', true)
+        .example__option
+          +option('step', 'number', true)
+        .example__option
+          +option('from', 'number')
+        .example__option
+          +option('to', 'number')
+      .example__options-row
+        .example__option
+          +option('double', 'checkbox')
+        .example__option
+          +option('tip', 'checkbox')
+        .example__option
+          +option('scale', 'checkbox')
+        .example__option
+          +option('vertical', 'checkbox')

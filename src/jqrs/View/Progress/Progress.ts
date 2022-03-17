@@ -2,7 +2,6 @@ import Subject from '../../Subject/Subject';
 
 class Progress {
   public subject;
-  public rootDOMRect;
   public isVertical = false;
 
   private root;
@@ -11,7 +10,6 @@ class Progress {
   public constructor(subject: Subject, root: HTMLElement) {
     this.subject = subject;
     this.root = root;
-    this.rootDOMRect = root.getBoundingClientRect();
 
     this.initialize();
   }
@@ -23,38 +21,30 @@ class Progress {
 
   private initialize(): void {
     this.element.classList.add('jqrs__progress');
-    this.element.addEventListener('click', this.handleProgressClick.bind(this));
+    this.element.addEventListener('pointerdown', this.handleProgressPointerDown.bind(this));
     this.root.append(this.element);
   }
 
-  private handleProgressClick({ clientX, clientY }: MouseEvent): void {
+  private handleProgressPointerDown({ clientX, clientY }: PointerEvent): void {
+    const rootDOMRect = this.root.getBoundingClientRect();
     let positionPercentage;
 
     if (this.isVertical) {
-      const position = clientY - this.rootDOMRect.top;
-      positionPercentage = 100 - (100 / (this.rootDOMRect.height / position));
+      const position = clientY - rootDOMRect.top;
+      positionPercentage = 100 - (100 / (rootDOMRect.height / position));
     } else {
-      const position = clientX - this.rootDOMRect.left;
-      positionPercentage = 100 / (this.rootDOMRect.width / position);
+      const position = clientX - rootDOMRect.left;
+      positionPercentage = 100 / (rootDOMRect.width / position);
     }
 
-    this.subject.notify('progressClick', positionPercentage);
+    this.subject.notify('progressPointerDown', positionPercentage);
   }
 
   private setPositionHelper(from: number, to: number): void {
-    const newTo = to === 100 ? 0 : 99.9999 - to;
-
-    if (this.isVertical) {
-      this.element.style.left = '';
-      this.element.style.right = '';
-      this.element.style.bottom = `${from}%`;
-      this.element.style.top = `${newTo}%`;
-    } else {
-      this.element.style.bottom = '';
-      this.element.style.top = '';
-      this.element.style.left = `${from}%`;
-      this.element.style.right = `${newTo}%`;
-    }
+    this.element.style.top = this.isVertical ? `${100 - to}%` : '';
+    this.element.style.right = this.isVertical ? '' : `${100 - to}%`;
+    this.element.style.bottom = this.isVertical ? `${from}%` : '';
+    this.element.style.left = this.isVertical ? '' : `${from}%`;
   }
 }
 

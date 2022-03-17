@@ -2,7 +2,6 @@ import Subject from '../../Subject/Subject';
 
 class Thumb {
   public subject;
-  public rootDOMRect;
   public element = document.createElement('div');
   public isVertical = false;
 
@@ -12,7 +11,6 @@ class Thumb {
   public constructor(subject: Subject, root: HTMLElement, type: 'from' | 'to') {
     this.subject = subject;
     this.root = root;
-    this.rootDOMRect = root.getBoundingClientRect();
     this.type = type;
 
     this.initialize();
@@ -27,41 +25,40 @@ class Thumb {
   }
 
   public setPosition(position: number): void {
-    if (this.isVertical) {
-      this.element.style.left = '';
-      this.element.style.bottom = `${position}%`;
-    } else {
-      this.element.style.bottom = '';
-      this.element.style.left = `${position}%`;
-    }
+    this.element.style.bottom = this.isVertical ? `${position}%` : '';
+    this.element.style.left = this.isVertical ? '' : `${position}%`;
   }
 
   private initialize(): void {
     this.element.classList.add('jqrs__thumb');
-    this.element.addEventListener('mousedown', this.handleThumbMousedown);
+    this.element.addEventListener('pointerdown', this.handleThumbPointerdown.bind(this));
   }
 
-  private handleThumbMousedown = (): void => {
-    document.addEventListener('mousemove', this.handleDocumentMousemove);
-    document.addEventListener('mouseup', this.handleDocumentMouseup.bind(this), { once: true });
+  private handleThumbPointerdown = ({ pointerId }: PointerEvent): void => {
+    this.element.classList.add('jqrs__thumb_is-active');
+    this.element.addEventListener('pointermove', this.handleThumbPointermove);
+    this.element.addEventListener('pointerup', this.handleThumbPointerup.bind(this), { once: true });
+    this.element.setPointerCapture(pointerId);
   };
 
-  private handleDocumentMousemove = ({ clientX, clientY }: MouseEvent): void => {
+  private handleThumbPointermove = ({ clientX, clientY }: PointerEvent): void => {
+    const rootDOMRect = this.root.getBoundingClientRect();
     let positionPercentage;
 
     if (this.isVertical) {
-      const position = clientY - this.rootDOMRect.top;
-      positionPercentage = 100 - (100 / (this.rootDOMRect.height / position));
+      const position = clientY - rootDOMRect.top;
+      positionPercentage = 100 - (100 / (rootDOMRect.height / position));
     } else {
-      const position = clientX - this.rootDOMRect.left;
-      positionPercentage = 100 / (this.rootDOMRect.width / position);
+      const position = clientX - rootDOMRect.left;
+      positionPercentage = 100 / (rootDOMRect.width / position);
     }
 
-    this.subject.notify(`${this.type}ThumbMove`, positionPercentage);
+    this.subject.notify(`${this.type}ThumbPointermove`, positionPercentage);
   };
 
-  private handleDocumentMouseup(): void {
-    document.removeEventListener('mousemove', this.handleDocumentMousemove);
+  private handleThumbPointerup(): void {
+    this.element.classList.remove('jqrs__thumb_is-active');
+    this.element.removeEventListener('pointermove', this.handleThumbPointermove);
   }
 }
 

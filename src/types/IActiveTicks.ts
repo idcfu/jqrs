@@ -1,8 +1,8 @@
 import IActiveTick from './IActiveTick';
 
 interface IActiveTicks {
-  fromTick: IActiveTick;
-  toTick: IActiveTick;
+  from: IActiveTick;
+  to: IActiveTick;
 }
 
 export default IActiveTicks;
