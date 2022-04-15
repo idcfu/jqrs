@@ -12,5 +12,5 @@ examples.forEach(({ id, min, max, step, from, to, isDouble, hasTip, hasScale, is
     hasTip,
     hasScale,
     isVertical,
-  }).initialize();
+  });
 });

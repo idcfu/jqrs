@@ -5,11 +5,16 @@
   ],
 
   "rules": {
-    "@typescript-eslint/explicit-function-return-type": ["error"],
+    "@typescript-eslint/explicit-function-return-type": [
+      "error"
+    ],
+
     "@typescript-eslint/lines-between-class-members": [
       "error",
       "always",
-      { "exceptAfterSingleLine": true }
+      {
+        "exceptAfterSingleLine": true
+      }
     ],
 
     "@typescript-eslint/member-delimiter-style": [
@@ -28,7 +33,12 @@
     ],
 
     "func-names": "off",
-    "func-style": ["error", "expression"],
+    "func-style": [
+      "error",
+      "expression"
+    ],
+
+    "no-new": "off",
     "object-curly-newline": "off"
   },
 

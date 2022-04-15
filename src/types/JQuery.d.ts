@@ -1,9 +1,8 @@
-import Presenter from '../jqrs/Presenter/Presenter';
-import IOptions from './IOptions';
-import IUpdate from './IUpdate';
+import IFacade from '../plugin/FacadeFactory/IFacade';
+import { IOptions } from './types';
 
 declare global {
   interface JQuery {
-    jqrs(options: IOptions, update?: IUpdate): Presenter;
+    jqrs(options: IOptions): IFacade;
   }
 }

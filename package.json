@@ -5,10 +5,17 @@
     "defaults"
   ],
 
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "./src/helpers/testsSetup.ts"
+    ]
+  },
+
   "scripts": {
-    "lint": "eslint --fix . --ext .ts",
-    "test:coverage": "jest --coverage",
+    "lint": "concurrently \"stylelint \"**/*.scss\" --fix\" \"eslint . --ext .ts --fix\"",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "dev": "webpack serve --mode development",
     "prod": "webpack --mode production"
   },
@@ -33,17 +40,22 @@
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   },
-  
+
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "@types/webpack-dev-server": "^4.7.2",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
+    "concurrently": "^7.1.0",
     "eslint": "^8.5.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^16.1.0",
     "eslint-plugin-import": "^2.25.3",
     "jest": "^27.4.7",
+    "postcss": "^8.4.12",
+    "stylelint": "^14.6.1",
+    "stylelint-config-sass-guidelines": "^9.0.1",
+    "stylelint-order-htmlacademy": "^2.0.6",
     "webpack-dev-server": "^4.7.2"
   }
 }

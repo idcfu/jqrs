@@ -1,18 +1,4 @@
-import IOptions from '../../../types/IOptions';
-
-interface IElements {
-  example: HTMLElement;
-  jqrs: HTMLElement;
-  min: HTMLInputElement;
-  max: HTMLInputElement;
-  step: HTMLInputElement;
-  from: HTMLInputElement;
-  to: HTMLInputElement;
-  double: HTMLInputElement;
-  tip: HTMLInputElement;
-  scale: HTMLInputElement;
-  vertical: HTMLInputElement;
-}
+import { IElements, IOptions } from '../../../types/types';
 
 class Example {
   private elements;
@@ -20,48 +6,51 @@ class Example {
 
   public constructor(id: number, options: IOptions) {
     this.elements = Example.findElements(id);
-    this.plugin = $(this.elements.jqrs).jqrs(options, this.update.bind(this));
-  }
+    this.plugin = $(this.elements.jqrs).jqrs(options);
 
-  public initialize(): void {
-    this.elements.example.addEventListener('change', this.handleExampleChange.bind(this));
+    this.initialize();
   }
 
   private static findElements(id: number): IElements {
     const example = document.querySelector(`#js-example-${id}`) as HTMLElement;
-    if (!(example instanceof HTMLElement)) throw new Error(`'${example}' is not a HTML element`);
+    if (!(example instanceof HTMLElement)) throw new Error("'example' is not a HTML element");
 
     const jqrs = example.querySelector('.js-jqrs') as HTMLElement;
-    if (!(jqrs instanceof HTMLElement)) throw new Error(`'${jqrs}' is not a HTML element`);
+    if (!(jqrs instanceof HTMLElement)) throw new Error("'jqrs' is not a HTML element");
 
     const min = example.querySelector('.js-option__value_type_min') as HTMLInputElement;
-    if (!(min instanceof HTMLInputElement)) throw new Error(`'${min}' is not an 'input' element`);
+    if (!(min instanceof HTMLInputElement)) throw new Error("'min' is not an 'input' element");
 
     const max = example.querySelector('.js-option__value_type_max') as HTMLInputElement;
-    if (!(max instanceof HTMLInputElement)) throw new Error(`'${max}' is not an 'input' element`);
+    if (!(max instanceof HTMLInputElement)) throw new Error("'max' is not an 'input' element");
 
     const step = example.querySelector('.js-option__value_type_step') as HTMLInputElement;
-    if (!(step instanceof HTMLInputElement)) throw new Error(`'${step}' is not an 'input' element`);
+    if (!(step instanceof HTMLInputElement)) throw new Error("'step' is not an 'input' element");
 
     const from = example.querySelector('.js-option__value_type_from') as HTMLInputElement;
-    if (!(from instanceof HTMLInputElement)) throw new Error(`'${from}' is not an 'input' element`);
+    if (!(from instanceof HTMLInputElement)) throw new Error("'from' is not an 'input' element");
 
     const to = example.querySelector('.js-option__value_type_to') as HTMLInputElement;
-    if (!(to instanceof HTMLInputElement)) throw new Error(`'${to}' is not an 'input' element`);
+    if (!(to instanceof HTMLInputElement)) throw new Error("'to' is not an 'input' element");
 
     const double = example.querySelector('.js-option__value_type_double') as HTMLInputElement;
-    if (!(double instanceof HTMLInputElement)) throw new Error(`'${double}' is not an 'input' element`);
+    if (!(double instanceof HTMLInputElement)) throw new Error("'double' is not an 'input' element");
 
     const tip = example.querySelector('.js-option__value_type_tip') as HTMLInputElement;
-    if (!(tip instanceof HTMLInputElement)) throw new Error(`'${tip}' is not an 'input' element`);
+    if (!(tip instanceof HTMLInputElement)) throw new Error("'tip' is not an 'input' element");
 
     const scale = example.querySelector('.js-option__value_type_scale') as HTMLInputElement;
-    if (!(scale instanceof HTMLInputElement)) throw new Error(`'${scale}' is not an 'input' element`);
+    if (!(scale instanceof HTMLInputElement)) throw new Error("'scale' is not an 'input' element");
 
     const vertical = example.querySelector('.js-option__value_type_vertical') as HTMLInputElement;
-    if (!(vertical instanceof HTMLInputElement)) throw new Error(`'${vertical}' is not an 'input' element`);
+    if (!(vertical instanceof HTMLInputElement)) throw new Error("'vertical' is not an 'input' element");
 
     return { example, jqrs, min, max, step, from, to, double, tip, scale, vertical };
+  }
+
+  private initialize(): void {
+    this.plugin.setUpdate(this.update.bind(this));
+    this.elements.example.addEventListener('change', this.handleExampleChange.bind(this));
   }
 
   private handleExampleChange({ target }: Event): void {

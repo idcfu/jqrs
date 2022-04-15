@@ -10,7 +10,7 @@ const devtool = isProduction ? false : 'source-map';
 
 const configuration: Configuration = {
   entry: {
-    jqrs: './src/jqrs',
+    plugin: './src/plugin',
     demo: './src/demo',
   },
 
@@ -27,7 +27,7 @@ const configuration: Configuration = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
-          chunks: ({ name }: Chunk) => name !== 'jqrs',
+          chunks: ({ name }: Chunk) => name !== 'plugin',
         },
       },
     },

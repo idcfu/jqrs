@@ -5,5 +5,6 @@ mixin option(name, type, hasStep)
       type=type
       step=(hasStep && 'any')
     )
+
     if (type === 'checkbox')
       span.option__tick L

@@ -1,5 +1,3 @@
-const importAll = function (requireContext: __WebpackModuleApi.RequireContext): void {
-  requireContext.keys().forEach(requireContext);
-};
+import { importAll } from '../helpers/helpers';
 
 importAll(require.context('.', true, /\.(scss|ts)$/));
