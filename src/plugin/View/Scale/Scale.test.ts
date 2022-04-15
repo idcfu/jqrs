@@ -55,14 +55,14 @@ describe('Scale', () => {
     });
   });
 
-  it('fitScale', () => {
-    scale.fitScale = jest.fn(scale.fitScale.bind(scale));
+  it('fit', () => {
+    scale.fit = jest.fn(scale.fit.bind(scale));
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.classList.add('jqrs__tick');
     element.append(svg);
 
-    expect(scale.fitScale).toThrow(`'${svg}' is not a HTML element`);
+    expect(scale.fit).toThrow(`'${svg}' is not a HTML element`);
   });
 
   it('pointerdown', () => {

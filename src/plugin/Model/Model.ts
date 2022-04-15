@@ -221,10 +221,10 @@ class Model implements IModel {
       isVertical = false,
     } = options;
 
-    this.validateBoolean(isDouble, 'isDouble');
-    this.validateBoolean(hasTip, 'hasTip');
-    this.validateBoolean(hasScale, 'hasScale');
-    this.validateBoolean(isVertical, 'isVertical');
+    Model.validateBoolean(isDouble, 'isDouble');
+    Model.validateBoolean(hasTip, 'hasTip');
+    Model.validateBoolean(hasScale, 'hasScale');
+    Model.validateBoolean(isVertical, 'isVertical');
 
     let {
       min,
@@ -234,18 +234,18 @@ class Model implements IModel {
       to = max,
     } = options;
 
-    min = this.validateNumber(min, 'min');
-    max = this.validateNumber(max, 'max');
-    step = this.validateNumber(step, 'step');
-    from = this.validateNumber(from, 'from');
-    to = this.validateNumber(to, 'to');
+    min = Model.validateNumber(min, 'min');
+    max = Model.validateNumber(max, 'max');
+    step = Model.validateNumber(step, 'step');
+    from = Model.validateNumber(from, 'from');
+    to = Model.validateNumber(to, 'to');
 
     if (min >= max) {
       step = 0.0001;
-      min = this.roundValue(max - step);
+      min = Model.roundValue(max - step);
     }
 
-    const range = this.roundValue(max - min);
+    const range = Model.roundValue(max - min);
     if (step > range) step = range;
 
     return { min, max, step, from, to, isDouble, hasTip, hasScale, isVertical };
@@ -264,7 +264,7 @@ class Model implements IModel {
   ): number {
     if (!Number.isFinite(value)) throw new Error(`'${type}' is not a finite number`);
 
-    return this.roundValue(value);
+    return Model.roundValue(value);
   }
 
   private static roundValue(value: number): number {

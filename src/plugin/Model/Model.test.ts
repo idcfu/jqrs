@@ -101,6 +101,13 @@ describe('Model', () => {
     });
 
     it('variant 6', () => {
+      // @ts-ignore
+      expect(() => new Model(new Subject(), {
+        step: 1,
+      })).toThrow("Options object with 'min', 'max' and 'step' properties is required");
+    });
+
+    it('variant 7', () => {
       expect(() => new Model(new Subject(), {
         min: 0,
         max: 1,
@@ -110,10 +117,11 @@ describe('Model', () => {
       })).toThrow("'step' is not a finite number");
     });
 
-    it('variant 7', () => {
+    it('variant 8', () => {
       expect(() => new Model(new Subject(), {
         min: 0,
         max: 1,
+        step: 1,
 
         // @ts-ignore
         isDouble: '',
