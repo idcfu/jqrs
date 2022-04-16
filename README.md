@@ -2,9 +2,7 @@
 
 ## [Demo](https://idcfu.github.io/jqrs)
 
----
-
-## Usage
+## Usage. [Files](1.0.0)
 
 ``` html
 <!-- Add jQuery before. -->
@@ -45,6 +43,5 @@ const update = function (options) { ... }
 jqrs.setUpdate(update);
 jqrs.unsetUpdate(update);
 ```
----
 
 ## [UML](src/uml/uml.png)
