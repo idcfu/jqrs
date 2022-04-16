@@ -2,11 +2,11 @@ import { IElements, IOptions } from '../../../types/types';
 
 class Example {
   private elements;
-  private plugin;
+  private jqrs;
 
   public constructor(id: number, options: IOptions) {
     this.elements = Example.findElements(id);
-    this.plugin = $(this.elements.jqrs).jqrs(options);
+    this.jqrs = $(this.elements.jqrs).jqrs(options);
 
     this.initialize();
   }
@@ -49,7 +49,7 @@ class Example {
   }
 
   private initialize(): void {
-    this.plugin.setUpdate(this.update.bind(this));
+    this.jqrs.setUpdate(this.update.bind(this));
     this.elements.example.addEventListener('change', this.handleExampleChange.bind(this));
   }
 
@@ -58,28 +58,28 @@ class Example {
 
     switch (target) {
       case this.elements.min:
-        this.plugin.setMin(Number(target.value));
+        this.jqrs.setMin(Number(target.value));
         break;
       case this.elements.max:
-        this.plugin.setMax(Number(target.value));
+        this.jqrs.setMax(Number(target.value));
         break;
       case this.elements.step:
-        this.plugin.setStep(Number(target.value));
+        this.jqrs.setStep(Number(target.value));
         break;
       case this.elements.from:
-        this.plugin.setFrom(Number(target.value));
+        this.jqrs.setFrom(Number(target.value));
         break;
       case this.elements.to:
-        this.plugin.setTo(Number(target.value));
+        this.jqrs.setTo(Number(target.value));
         break;
       case this.elements.double:
-        this.plugin.setIsDouble(target.checked);
+        this.jqrs.setIsDouble(target.checked);
         break;
       case this.elements.tip:
-        this.plugin.setHasTip(target.checked);
+        this.jqrs.setHasTip(target.checked);
         break;
       case this.elements.scale:
-        this.plugin.setHasScale(target.checked);
+        this.jqrs.setHasScale(target.checked);
         break;
       case this.elements.vertical: {
         const exampleJqrs = this.elements.example.querySelector('.js-example__jqrs') as HTMLElement;
@@ -88,7 +88,7 @@ class Example {
         if (target.checked) exampleJqrs.classList.add('example__jqrs_is-vertical');
         else exampleJqrs.classList.remove('example__jqrs_is-vertical');
 
-        this.plugin.setIsVertical(target.checked);
+        this.jqrs.setIsVertical(target.checked);
       }
         break;
       default:
